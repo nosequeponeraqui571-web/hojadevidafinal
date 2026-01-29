@@ -22,6 +22,7 @@
                     colors: {
                         tron: {
                             bg: '#000000',
+                            // Color dinámico vinculado a variable CSS
                             primary: 'var(--primary-color)', 
                             dim: 'rgba(var(--primary-rgb), 0.1)',
                             white: '#e0faff',
@@ -33,6 +34,7 @@
                         rajdhani: ['Rajdhani', 'sans-serif'],
                     },
                     boxShadow: {
+                        // Sombras dinámicas
                         'neon': '0 0 5px var(--primary-color), 0 0 20px var(--primary-color)',
                         'hud': 'inset 0 0 20px rgba(var(--primary-rgb), 0.15)',
                     },
@@ -49,11 +51,13 @@
     <style>
         /* DEFINICIÓN DE TEMAS */
         :root {
+            /* TEMA LEGACY (Por defecto) */
             --primary-color: #00f3ff;
             --primary-rgb: 0, 243, 255;
             --bg-color: #000000;
         }
 
+        /* TEMA ARES (Clase activada por JS) */
         body.theme-ares {
             --primary-color: #ff003c;
             --primary-rgb: 255, 0, 60;
@@ -66,34 +70,60 @@
             font-family: 'Rajdhani', sans-serif;
             overflow-x: hidden;
             transition: background-color 0.5s ease, color 0.5s ease;
+            
+            /* --- EFECTO BLOOM GENERAL --- */
             text-shadow: 0 0 4px rgba(var(--primary-rgb), 0.4);
         }
 
+        /* --- EFECTO BLOOM INTENSO --- */
         h1, h2, h3, .font-orbitron, .text-tron-primary, .expand-text {
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 15px var(--primary-color), 0 0 25px rgba(var(--primary-rgb), 0.6);
+            text-shadow: 
+                0 0 5px rgba(255, 255, 255, 0.8),
+                0 0 15px var(--primary-color),
+                0 0 25px rgba(var(--primary-rgb), 0.6);
         }
 
+        /* FONDO DE RED DINÁMICO */
         .the-grid {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background-image: linear-gradient(rgba(var(--primary-rgb), 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--primary-rgb), 0.1) 1px, transparent 1px);
-            background-size: 50px 50px; background-position: center top;
+            background-image: 
+                linear-gradient(rgba(var(--primary-rgb), 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(var(--primary-rgb), 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: center top;
             transform: perspective(500px) rotateX(60deg) translateY(-100px) scale(1.5);
-            opacity: 0.6; z-index: -1; pointer-events: none; animation: moveGrid 20s linear infinite;
+            opacity: 0.6;
+            z-index: -1;
+            pointer-events: none;
+            animation: moveGrid 20s linear infinite;
             transition: all 0.5s ease;
         }
 
-        @keyframes moveGrid { 0% { background-position: 0 0; } 100% { background-position: 0 50px; } }
+        @keyframes moveGrid {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 50px; }
+        }
 
-        .clip-tron { clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
+        /* RECORTE ANGULAR */
+        .clip-tron {
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
 
         .border-glow:hover { 
             box-shadow: 0 0 15px var(--primary-color), inset 0 0 10px rgba(var(--primary-rgb), 0.2); 
             border-color: var(--primary-color);
         }
 
-        .sidebar-container { width: 4.5rem; transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1); border-right: 1px solid rgba(var(--primary-rgb), 0.3); }
-        .sidebar-container:hover { width: 18rem; }
+        /* SIDEBAR */
+        .sidebar-container {
+            width: 4.5rem; 
+            transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            border-right: 1px solid rgba(var(--primary-rgb), 0.3);
+        }
+        .sidebar-container:hover {
+            width: 18rem; 
+        }
 
         .expand-text {
             opacity: 0; max-width: 0; margin-left: 0; overflow: hidden;
@@ -102,33 +132,38 @@
         }
         .sidebar-container:hover .expand-text { opacity: 1; max-width: 180px; margin-left: 0.75rem; }
 
+        /* SCROLLBAR */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: var(--primary-color); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
 
-        /* Scrollbars para el visor de fotos */
-        .custom-viewer-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
-        .custom-viewer-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
-        .custom-viewer-scroll::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 5px; border: 2px solid #000; }
-
+        /* LABELS */
         .label-tron {
-            font-family: 'Orbitron', sans-serif; color: var(--primary-color);
-            font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase;
-            border-bottom: 1px solid rgba(var(--primary-rgb), 0.3); margin-bottom: 4px; display: inline-block;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary-color);
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(var(--primary-rgb), 0.3);
+            margin-bottom: 4px;
+            display: inline-block;
             text-shadow: 0 0 8px var(--primary-color);
         }
         .value-tron { font-family: 'Rajdhani', sans-serif; color: #fff; font-size: 1rem; }
 
+        /* DISCO CIRCULAR DINÁMICO */
         .disc-ring { border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-sizing: border-box; transition: border-color 0.5s ease, box-shadow 0.5s ease; }
+        
         .ring-1 { width: 100%; height: 100%; border: 3px solid var(--primary-color); box-shadow: 0 0 15px var(--primary-color), inset 0 0 10px var(--primary-color); }
         .ring-2 { width: 88%; height: 88%; border: 1px dashed rgba(255, 255, 255, 0.5); animation: rotate-center-reverse 20s linear infinite; }
         .ring-3 { width: 112%; height: 112%; border-top: 2px solid transparent; border-right: 2px solid var(--primary-color); border-bottom: 2px solid transparent; border-left: 2px solid var(--primary-color); animation: rotate-center 6s linear infinite; opacity: 0.8; }
         .ring-4 { width: 130%; height: 130%; border: 1px solid var(--primary-color); opacity: 0.3; animation: rotate-center 12s linear infinite; }
 
         @keyframes rotate-center { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
-        @keyframes rotate-center-reverse { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+        @keyframes rotate-center-reverse { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(-360deg); } }
 
+        /* MODAL */
         .modal-enter { animation: modalIn 0.3s ease-out forwards; }
         .modal-exit { animation: modalOut 0.3s ease-in forwards; }
         @keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
@@ -139,8 +174,8 @@
 
     <div class="the-grid"></div>
 
-    <!-- MODAL PREVISUALIZADOR ADAPTATIVO CON SCROLL MEJORADO -->
-    <div id="preview-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/95 backdrop-blur-sm p-4 md:p-8">
+    <!-- MODAL PREVISUALIZADOR ADAPTATIVO -->
+    <div id="preview-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 md:p-8">
         <div id="modal-content" class="relative bg-black border border-tron-primary shadow-neon flex flex-col clip-tron transition-all duration-500 ease-in-out overflow-hidden">
             <!-- Header -->
             <div class="flex justify-between items-center p-4 border-b border-tron-primary/30 bg-tron-primary/10 shrink-0">
@@ -148,41 +183,31 @@
                     <i class="fas fa-eye text-tron-primary animate-pulse-glow"></i>
                     <h3 class="text-tron-primary font-orbitron tracking-widest text-lg">VISOR DE DATOS</h3>
                 </div>
-                <div class="flex items-center gap-4">
-                    <button onclick="reloadCurrentPreview()" class="text-gray-400 hover:text-tron-primary transition" title="Recargar">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                    <button onclick="closePreview()" class="text-gray-400 hover:text-white hover:bg-tron-primary/20 w-8 h-8 flex items-center justify-center rounded-full transition border border-transparent hover:border-tron-primary">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
+                <button onclick="closePreview()" class="text-gray-400 hover:text-white hover:bg-tron-primary/20 w-8 h-8 flex items-center justify-center rounded-full transition border border-transparent hover:border-tron-primary">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
 
             <!-- Contenedor de Contenido -->
             <div class="flex-1 p-1 bg-black/80 relative flex items-center justify-center overflow-hidden">
                 <!-- Loader -->
-                <div id="preview-loader" class="absolute inset-0 flex items-center justify-center z-50 bg-black">
-                    <div class="flex flex-col items-center gap-3">
-                        <div class="w-16 h-16 border-4 border-tron-primary border-t-transparent rounded-full animate-spin"></div>
-                        <span class="text-tron-primary font-orbitron text-[10px] tracking-widest animate-pulse">SINCRONIZANDO SISTEMA...</span>
-                    </div>
+                <div id="preview-loader" class="absolute inset-0 flex items-center justify-center z-0">
+                    <div class="w-16 h-16 border-4 border-tron-primary border-t-transparent rounded-full animate-spin"></div>
                 </div>
                 
-                <!-- Visor Documento (Usando Iframe directo con ancho adaptativo) -->
-                <div id="frame-container" class="hidden w-full h-full relative z-10 overflow-auto">
-                    <iframe id="preview-frame" src="" class="w-full h-full border border-tron-primary/20 bg-white"></iframe>
-                </div>
+                <!-- Visor PDF -->
+                <iframe id="preview-frame" src="" class="hidden w-full h-full border border-tron-primary/20 relative z-10 bg-white"></iframe>
                 
-                <!-- Visor Imagen con SCROLLBARS H/V -->
-                <div id="image-container" class="hidden w-full h-full relative z-10 flex items-center justify-center overflow-auto p-4 custom-viewer-scroll">
-                    <img id="preview-image" src="" class="max-w-none shadow-2xl border border-tron-primary/20 bg-black/50 block mx-auto">
+                <!-- Visor Imagen -->
+                <div id="image-container" class="hidden w-full h-full relative z-10 flex items-center justify-center overflow-auto p-2">
+                    <img id="preview-image" src="" class="max-w-full max-h-full object-contain shadow-2xl border border-tron-primary/20 bg-black/50">
                 </div>
             </div>
 
             <!-- Footer -->
             <div class="p-2 border-t border-tron-primary/30 bg-black flex justify-end shrink-0">
-                <a id="download-link" href="#" target="_blank" class="text-xs font-mono text-tron-primary hover:text-white flex items-center gap-2 px-4 py-2 border border-tron-primary/30 hover:bg-tron-primary/10 transition uppercase tracking-widest">
-                    <i class="fas fa-external-link-alt"></i> Abrir externo
+                <a id="download-link" href="#" target="_blank" class="text-xs font-mono text-tron-primary hover:text-white flex items-center gap-2 px-4 py-2 border border-tron-primary/30 hover:bg-tron-primary/10 transition">
+                    <i class="fas fa-external-link-alt"></i> ABRIR EN VENTANA EXTERNA
                 </a>
             </div>
         </div>
@@ -193,13 +218,16 @@
         <!-- SIDEBAR -->
         <aside class="sidebar-container bg-black/90 backdrop-blur-xl flex flex-col md:fixed md:h-screen z-50 overflow-x-hidden no-scrollbar group shadow-none transition-shadow duration-500 hover:shadow-neon">
             
+            <!-- CABECERA DE PERFIL + BOTÓN DE CAMBIO -->
             <div class="h-14 flex items-center justify-center border-b border-tron-primary/20 bg-gradient-to-r from-tron-primary/10 to-transparent overflow-hidden relative">
+                <!-- Botón Switcher -->
                 <button onclick="toggleTheme()" class="w-full h-full flex items-center justify-center group/btn focus:outline-none" title="Cambiar Tema (Legacy/Ares)">
                     <i id="theme-icon" class="fas fa-microchip text-tron-primary text-xl transition-all duration-500 group-hover/btn:rotate-180 group-hover/btn:scale-125 animate-pulse-glow"></i>
                     <span class="absolute bottom-1 text-[8px] text-tron-primary opacity-0 group-hover/btn:opacity-100 transition-opacity font-orbitron tracking-widest">SWITCH</span>
                 </button>
             </div>
 
+            <!-- NAVEGACIÓN -->
             <nav class="flex-1 px-1 md:px-2 py-4 space-y-3">
                 {% if perfil.archivo_cv %}
                 <div class="flex flex-col gap-1 mb-2 group/cv-container">
@@ -210,6 +238,7 @@
                 </div>
                 {% endif %}
 
+                <!-- Generar PDF -->
                 <div class="flex flex-col gap-1 mb-8 group/cv-gen">
                     <a href="{% url 'exportar_cv' %}" target="_blank" class="flex items-center px-3 py-3 clip-tron bg-white/5 border-l-4 border-white text-white hover:bg-white hover:text-black transition-all duration-300 shadow-hud overflow-hidden whitespace-nowrap w-full text-left">
                         <i class="fas fa-print text-lg min-w-[24px] text-center flex-shrink-0 text-white group-hover:text-black"></i> 
@@ -286,7 +315,10 @@
             
             <!-- HERO SECTION -->
             <section id="inicio" class="min-h-screen flex flex-col justify-center mb-20 relative">
+                
                 <div class="mb-12 pl-4 md:pl-8 relative flex flex-col md:flex-row items-center gap-12 md:gap-16">
+                    
+                    <!-- DISCO CIRCULAR DINÁMICO -->
                     <div class="relative w-64 h-64 flex-shrink-0 group cursor-pointer flex justify-center items-center">
                         <div class="disc-ring ring-4"></div> 
                         <div class="disc-ring ring-3"></div>
@@ -301,6 +333,7 @@
                         </div>
                     </div>
 
+                    <!-- TEXTO DE PRESENTACIÓN -->
                     <div class="text-center md:text-left border-l-0 md:border-l-8 border-tron-primary md:pl-10">
                         <h3 class="text-xl text-tron-primary font-orbitron mb-2 tracking-[0.4em] animate-pulse-glow">IDENTIDAD RECONOCIDA</h3>
                         <h1 class="text-6xl md:text-8xl font-black text-white uppercase mb-4 text-glow leading-tight font-orbitron">
@@ -313,6 +346,7 @@
                     </div>
                 </div>
 
+                <!-- Dashboard Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div class="bg-black/60 border border-tron-primary/30 p-8 clip-tron relative group transition-all duration-300 border-glow backdrop-blur-sm">
                         <div class="absolute top-0 right-0 p-4 opacity-30 group-hover:opacity-100 transition"><i class="fas fa-id-card text-5xl text-tron-primary"></i></div>
@@ -558,7 +592,7 @@
                     {% for prod in productos_academicos %}
                     <div class="p-6 bg-tron-panel border border-white/20 hover:border-white transition-all duration-300 shadow-neon-white clip-tron h-full flex flex-col group">
                         
-                        <!-- IMAGEN PREVIA -->
+                        <!-- IMAGEN PREVIA (Estilo Mejorado) -->
                         {% if prod.imagen_producto %}
                         <div class="w-full h-56 mb-4 overflow-hidden border border-white/10 relative clip-tron bg-black/50">
                             <!-- Overlay al hacer hover -->
@@ -567,7 +601,7 @@
                                     <i class="fas fa-expand me-2"></i> AMPLIAR
                                 </span>
                             </div>
-                            <!-- Imagen ajustada -->
+                            <!-- Imagen ajustada para cubrir pero centrada -->
                             <img src="{{ prod.imagen_producto.url }}" alt="{{ prod.nombrerecurso }}" class="w-full h-full object-cover object-top opacity-90 group-hover:scale-110 transition-transform duration-700">
                         </div>
                         {% endif %}
@@ -579,7 +613,7 @@
                         <span class="inline-block bg-white/10 text-white text-[10px] px-2 py-1 mt-1 mb-4 uppercase font-orbitron self-start">{{ prod.clasificador|default:"" }}</span>
                         <p class="text-gray-200 text-sm border-t border-white/10 pt-4 font-rajdhani flex-grow">{{ prod.descripcion|default:"" }}</p>
                         
-                        <!-- BOTÓN VISUALIZAR -->
+                        <!-- BOTÓN VISUALIZAR (Igual que certificados) -->
                         {% if prod.imagen_producto %}
                         <div class="mt-6">
                             <button onclick="openPreview('{{ prod.imagen_producto.url }}')" class="w-full block text-center py-3 bg-white/5 border border-white text-white text-sm hover:bg-white hover:text-black transition uppercase font-bold tracking-widest clip-tron font-orbitron">
@@ -675,12 +709,12 @@
 
     <!-- Script del Previsualizador y Toggle de Tema -->
     <script>
-        let lastPreviewUrl = "";
-
         function toggleTheme() {
             const body = document.getElementById('main-body');
             const icon = document.getElementById('theme-icon');
+            
             body.classList.toggle('theme-ares');
+            
             if(body.classList.contains('theme-ares')) {
                 localStorage.setItem('cv-theme', 'ares');
                 icon.style.transform = 'rotate(180deg)';
@@ -694,14 +728,14 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('cv-theme');
-            if(savedTheme === 'ares') { toggleTheme(); }
+            if(savedTheme === 'ares') {
+                toggleTheme(); 
+            }
         });
 
         function openPreview(url) {
-            lastPreviewUrl = url;
             const modal = document.getElementById('preview-modal');
             const content = document.getElementById('modal-content');
-            const frameContainer = document.getElementById('frame-container');
             const frame = document.getElementById('preview-frame');
             const imgContainer = document.getElementById('image-container');
             const img = document.getElementById('preview-image');
@@ -710,53 +744,34 @@
             modal.classList.remove('hidden');
             loader.classList.remove('hidden');
             
-            // Limpieza previa
-            frameContainer.classList.add('hidden');
-            imgContainer.classList.add('hidden');
-            frame.src = '';
-            img.src = '';
-
-            // DETECCIÓN DE TIPO DE ARCHIVO
-            const cleanUrl = url.toLowerCase().split(/[?#]/)[0];
-            const isPdf = cleanUrl.endsWith('.pdf');
+            // Detectar extensión (muy básico, puedes mejorarlo con regex o verificando mimetype si lo tienes)
+            const isImage = url.match(/\.(jpeg|jpg|gif|png|webp)$/i) || url.includes('image/upload');
             
-            // LÓGICA DE TAMAÑO ADAPTATIVO UNIFICADA
-            content.classList.remove('w-full', 'max-w-5xl', 'h-[85vh]');
-            content.classList.add('w-auto', 'max-w-[95vw]', 'max-h-[90vh]');
-
-            const cacheBuster = url.includes('?') ? `&t=${Date.now()}` : `?t=${Date.now()}`;
-            const finalUrl = url + cacheBuster;
-
-            if (isPdf) {
-                // VISUALIZACIÓN DE DOCUMENTO (Iframe directo corregido)
-                frameContainer.classList.remove('hidden');
-                
-                // Forzamos dimensiones mínimas para que el iframe sea visible en el contenedor adaptativo
-                frame.style.width = "85vw";
-                frame.style.height = "80vh";
-                frame.src = finalUrl;
-                
-                frame.onload = () => loader.classList.add('hidden');
-            } else {
-                // VISUALIZACIÓN DE IMAGEN (Con scrollbars si es grande)
+            if (isImage) {
+                // Configuración para FOTOS (Adaptable)
+                frame.classList.add('hidden');
                 imgContainer.classList.remove('hidden');
-                img.src = finalUrl;
+                img.src = url;
+                
+                // Clases de tamaño adaptable
+                content.classList.remove('w-full', 'max-w-5xl', 'h-[85vh]');
+                content.classList.add('w-auto', 'max-w-[90vw]', 'max-h-[90vh]');
                 
                 img.onload = () => loader.classList.add('hidden');
-                img.onerror = () => {
-                    loader.classList.add('hidden');
-                    alert("ERROR DE ACCESO AL NÚCLEO. RECARGUE EL SISTEMA.");
-                }
+            } else {
+                // Configuración para PDF (Estándar)
+                imgContainer.classList.add('hidden');
+                frame.classList.remove('hidden');
+                frame.src = url;
+                
+                // Clases de tamaño fijo para lectura
+                content.classList.add('w-full', 'max-w-5xl', 'h-[85vh]');
+                content.classList.remove('w-auto', 'max-w-[90vw]', 'max-h-[90vh]');
+                
+                frame.onload = () => loader.classList.add('hidden');
             }
             
             document.getElementById('download-link').href = url;
-        }
-
-        function reloadCurrentPreview() {
-            if (lastPreviewUrl) {
-                document.getElementById('preview-loader').classList.remove('hidden');
-                openPreview(lastPreviewUrl);
-            }
         }
 
         function closePreview() {
@@ -764,7 +779,6 @@
             document.getElementById('preview-frame').src = '';
             document.getElementById('preview-image').src = '';
         }
-
         document.addEventListener('keydown', function(event) { if (event.key === "Escape") closePreview(); });
         document.getElementById('preview-modal').addEventListener('click', function(e) { if (e.target === this) closePreview(); });
     </script>
