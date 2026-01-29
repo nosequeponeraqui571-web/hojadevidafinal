@@ -161,7 +161,7 @@
         .ring-4 { width: 130%; height: 130%; border: 1px solid var(--primary-color); opacity: 0.3; animation: rotate-center 12s linear infinite; }
 
         @keyframes rotate-center { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
-        @keyframes rotate-center-reverse { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(-360deg); } }
+        @keyframes rotate-center-reverse { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
 
         /* MODAL */
         .modal-enter { animation: modalIn 0.3s ease-out forwards; }
@@ -174,7 +174,7 @@
 
     <div class="the-grid"></div>
 
-    <!-- MODAL PREVISUALIZADOR ADAPTATIVO -->
+    <!-- MODAL PREVISUALIZADOR ADAPTATIVO MEJORADO -->
     <div id="preview-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 md:p-8">
         <div id="modal-content" class="relative bg-black border border-tron-primary shadow-neon flex flex-col clip-tron transition-all duration-500 ease-in-out overflow-hidden">
             <!-- Header -->
@@ -183,24 +183,33 @@
                     <i class="fas fa-eye text-tron-primary animate-pulse-glow"></i>
                     <h3 class="text-tron-primary font-orbitron tracking-widest text-lg">VISOR DE DATOS</h3>
                 </div>
-                <button onclick="closePreview()" class="text-gray-400 hover:text-white hover:bg-tron-primary/20 w-8 h-8 flex items-center justify-center rounded-full transition border border-transparent hover:border-tron-primary">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+                <div class="flex items-center gap-4">
+                    <!-- Botón de recarga para fallos de Render -->
+                    <button onclick="reloadCurrentPreview()" class="text-gray-400 hover:text-tron-primary transition" title="Recargar documento">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button onclick="closePreview()" class="text-gray-400 hover:text-white hover:bg-tron-primary/20 w-8 h-8 flex items-center justify-center rounded-full transition border border-transparent hover:border-tron-primary">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Contenedor de Contenido -->
             <div class="flex-1 p-1 bg-black/80 relative flex items-center justify-center overflow-hidden">
                 <!-- Loader -->
-                <div id="preview-loader" class="absolute inset-0 flex items-center justify-center z-0">
-                    <div class="w-16 h-16 border-4 border-tron-primary border-t-transparent rounded-full animate-spin"></div>
+                <div id="preview-loader" class="absolute inset-0 flex items-center justify-center z-50 bg-black">
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="w-16 h-16 border-4 border-tron-primary border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-tron-primary font-orbitron text-[10px] tracking-widest animate-pulse">ACCEDIENDO AL NÚCLEO...</span>
+                    </div>
                 </div>
                 
                 <!-- Visor PDF -->
                 <iframe id="preview-frame" src="" class="hidden w-full h-full border border-tron-primary/20 relative z-10 bg-white"></iframe>
                 
-                <!-- Visor Imagen -->
-                <div id="image-container" class="hidden w-full h-full relative z-10 flex items-center justify-center overflow-auto p-2">
-                    <img id="preview-image" src="" class="max-w-full max-h-full object-contain shadow-2xl border border-tron-primary/20 bg-black/50">
+                <!-- Visor Imagen con SCROLLBARS -->
+                <div id="image-container" class="hidden w-full h-full relative z-10 overflow-auto p-4 custom-scrollbar">
+                    <img id="preview-image" src="" class="shadow-2xl border border-tron-primary/20 bg-black/50 block mx-auto">
                 </div>
             </div>
 
@@ -218,16 +227,13 @@
         <!-- SIDEBAR -->
         <aside class="sidebar-container bg-black/90 backdrop-blur-xl flex flex-col md:fixed md:h-screen z-50 overflow-x-hidden no-scrollbar group shadow-none transition-shadow duration-500 hover:shadow-neon">
             
-            <!-- CABECERA DE PERFIL + BOTÓN DE CAMBIO -->
             <div class="h-14 flex items-center justify-center border-b border-tron-primary/20 bg-gradient-to-r from-tron-primary/10 to-transparent overflow-hidden relative">
-                <!-- Botón Switcher -->
                 <button onclick="toggleTheme()" class="w-full h-full flex items-center justify-center group/btn focus:outline-none" title="Cambiar Tema (Legacy/Ares)">
                     <i id="theme-icon" class="fas fa-microchip text-tron-primary text-xl transition-all duration-500 group-hover/btn:rotate-180 group-hover/btn:scale-125 animate-pulse-glow"></i>
                     <span class="absolute bottom-1 text-[8px] text-tron-primary opacity-0 group-hover/btn:opacity-100 transition-opacity font-orbitron tracking-widest">SWITCH</span>
                 </button>
             </div>
 
-            <!-- NAVEGACIÓN -->
             <nav class="flex-1 px-1 md:px-2 py-4 space-y-3">
                 {% if perfil.archivo_cv %}
                 <div class="flex flex-col gap-1 mb-2 group/cv-container">
@@ -238,7 +244,6 @@
                 </div>
                 {% endif %}
 
-                <!-- Generar PDF -->
                 <div class="flex flex-col gap-1 mb-8 group/cv-gen">
                     <a href="{% url 'exportar_cv' %}" target="_blank" class="flex items-center px-3 py-3 clip-tron bg-white/5 border-l-4 border-white text-white hover:bg-white hover:text-black transition-all duration-300 shadow-hud overflow-hidden whitespace-nowrap w-full text-left">
                         <i class="fas fa-print text-lg min-w-[24px] text-center flex-shrink-0 text-white group-hover:text-black"></i> 
@@ -592,7 +597,7 @@
                     {% for prod in productos_academicos %}
                     <div class="p-6 bg-tron-panel border border-white/20 hover:border-white transition-all duration-300 shadow-neon-white clip-tron h-full flex flex-col group">
                         
-                        <!-- IMAGEN PREVIA (Estilo Mejorado) -->
+                        <!-- IMAGEN PREVIA -->
                         {% if prod.imagen_producto %}
                         <div class="w-full h-56 mb-4 overflow-hidden border border-white/10 relative clip-tron bg-black/50">
                             <!-- Overlay al hacer hover -->
@@ -601,7 +606,7 @@
                                     <i class="fas fa-expand me-2"></i> AMPLIAR
                                 </span>
                             </div>
-                            <!-- Imagen ajustada para cubrir pero centrada -->
+                            <!-- Imagen ajustada -->
                             <img src="{{ prod.imagen_producto.url }}" alt="{{ prod.nombrerecurso }}" class="w-full h-full object-cover object-top opacity-90 group-hover:scale-110 transition-transform duration-700">
                         </div>
                         {% endif %}
@@ -613,7 +618,7 @@
                         <span class="inline-block bg-white/10 text-white text-[10px] px-2 py-1 mt-1 mb-4 uppercase font-orbitron self-start">{{ prod.clasificador|default:"" }}</span>
                         <p class="text-gray-200 text-sm border-t border-white/10 pt-4 font-rajdhani flex-grow">{{ prod.descripcion|default:"" }}</p>
                         
-                        <!-- BOTÓN VISUALIZAR (Igual que certificados) -->
+                        <!-- BOTÓN VISUALIZAR -->
                         {% if prod.imagen_producto %}
                         <div class="mt-6">
                             <button onclick="openPreview('{{ prod.imagen_producto.url }}')" class="w-full block text-center py-3 bg-white/5 border border-white text-white text-sm hover:bg-white hover:text-black transition uppercase font-bold tracking-widest clip-tron font-orbitron">
@@ -709,12 +714,12 @@
 
     <!-- Script del Previsualizador y Toggle de Tema -->
     <script>
+        let lastUsedUrl = "";
+
         function toggleTheme() {
             const body = document.getElementById('main-body');
             const icon = document.getElementById('theme-icon');
-            
             body.classList.toggle('theme-ares');
-            
             if(body.classList.contains('theme-ares')) {
                 localStorage.setItem('cv-theme', 'ares');
                 icon.style.transform = 'rotate(180deg)';
@@ -728,12 +733,11 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('cv-theme');
-            if(savedTheme === 'ares') {
-                toggleTheme(); 
-            }
+            if(savedTheme === 'ares') { toggleTheme(); }
         });
 
         function openPreview(url) {
+            lastUsedUrl = url;
             const modal = document.getElementById('preview-modal');
             const content = document.getElementById('modal-content');
             const frame = document.getElementById('preview-frame');
@@ -744,27 +748,31 @@
             modal.classList.remove('hidden');
             loader.classList.remove('hidden');
             
-            // Detectar extensión (muy básico, puedes mejorarlo con regex o verificando mimetype si lo tienes)
-            const isImage = url.match(/\.(jpeg|jpg|gif|png|webp)$/i) || url.includes('image/upload');
+            // DETECCIÓN MEJORADA DE TIPO DE ARCHIVO
+            // Limpia parámetros de URL de Cloudinary para ver la extensión real
+            const cleanUrl = url.toLowerCase().split(/[?#]/)[0];
+            const isPdf = cleanUrl.endsWith('.pdf');
             
-            if (isImage) {
-                // Configuración para FOTOS (Adaptable)
+            if (!isPdf) {
+                // MODO IMAGEN: Tamaño Adaptativo con SCROLL
                 frame.classList.add('hidden');
                 imgContainer.classList.remove('hidden');
                 img.src = url;
                 
-                // Clases de tamaño adaptable
+                // Ajustamos el modal para que no se coma las barras si la foto es enorme
                 content.classList.remove('w-full', 'max-w-5xl', 'h-[85vh]');
                 content.classList.add('w-auto', 'max-w-[90vw]', 'max-h-[90vh]');
                 
                 img.onload = () => loader.classList.add('hidden');
             } else {
-                // Configuración para PDF (Estándar)
+                // MODO PDF: Tamaño Estándar + Cache Busting para Render
                 imgContainer.classList.add('hidden');
                 frame.classList.remove('hidden');
-                frame.src = url;
                 
-                // Clases de tamaño fijo para lectura
+                // Agregamos timestamp para forzar al servidor a no usar cache antigua tras inactividad
+                const cacheBuster = url.includes('?') ? `&t=${Date.now()}` : `?t=${Date.now()}`;
+                frame.src = url + cacheBuster;
+                
                 content.classList.add('w-full', 'max-w-5xl', 'h-[85vh]');
                 content.classList.remove('w-auto', 'max-w-[90vw]', 'max-h-[90vh]');
                 
@@ -774,11 +782,20 @@
             document.getElementById('download-link').href = url;
         }
 
+        function reloadCurrentPreview() {
+            if (lastUsedUrl) {
+                // Reiniciamos cargando
+                document.getElementById('preview-loader').classList.remove('hidden');
+                openPreview(lastUsedUrl);
+            }
+        }
+
         function closePreview() {
             document.getElementById('preview-modal').classList.add('hidden');
             document.getElementById('preview-frame').src = '';
             document.getElementById('preview-image').src = '';
         }
+
         document.addEventListener('keydown', function(event) { if (event.key === "Escape") closePreview(); });
         document.getElementById('preview-modal').addEventListener('click', function(e) { if (e.target === this) closePreview(); });
     </script>
