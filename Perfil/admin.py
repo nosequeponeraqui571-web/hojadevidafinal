@@ -45,6 +45,12 @@ class CursosRealizadosAdmin(admin.ModelAdmin):
 @admin.register(ProductosAcademicos)
 class ProductosAcademicosAdmin(admin.ModelAdmin):
     list_display = ('nombrerecurso', 'clasificador', 'activarparaqueseveaenfront')
+    # Se añade explícitamente el campo imagen_producto al formulario
+    fields = (
+        'idproductoacademico', 'idperfilconqueestaactivo', 
+        'nombrerecurso', 'clasificador', 'descripcion', 
+        'imagen_producto', 'activarparaqueseveaenfront'
+    )
 
 @admin.register(ProductosLaborales)
 class ProductosLaboralesAdmin(admin.ModelAdmin):

@@ -125,6 +125,8 @@ class ProductosAcademicos(models.Model):
     nombrerecurso = models.CharField(max_length=200)
     clasificador = models.CharField(max_length=100)
     descripcion = models.TextField()
+    # NUEVO CAMPO DE IMAGEN
+    imagen_producto = models.ImageField(upload_to='academicos/', null=True, blank=True, verbose_name="Imagen Representativa")
     activarparaqueseveaenfront = models.BooleanField(default=True)
 
     def __str__(self):
