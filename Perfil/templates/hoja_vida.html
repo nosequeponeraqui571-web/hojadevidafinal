@@ -22,7 +22,6 @@
                     colors: {
                         tron: {
                             bg: '#000000',
-                            // Color dinámico vinculado a variable CSS
                             primary: 'var(--primary-color)', 
                             dim: 'rgba(var(--primary-rgb), 0.1)',
                             white: '#e0faff',
@@ -34,7 +33,6 @@
                         rajdhani: ['Rajdhani', 'sans-serif'],
                     },
                     boxShadow: {
-                        // Sombras dinámicas
                         'neon': '0 0 5px var(--primary-color), 0 0 20px var(--primary-color)',
                         'hud': 'inset 0 0 20px rgba(var(--primary-rgb), 0.15)',
                     },
@@ -51,13 +49,11 @@
     <style>
         /* DEFINICIÓN DE TEMAS */
         :root {
-            /* TEMA LEGACY (Por defecto) */
             --primary-color: #00f3ff;
             --primary-rgb: 0, 243, 255;
             --bg-color: #000000;
         }
 
-        /* TEMA ARES (Clase activada por JS) */
         body.theme-ares {
             --primary-color: #ff003c;
             --primary-rgb: 255, 0, 60;
@@ -70,60 +66,29 @@
             font-family: 'Rajdhani', sans-serif;
             overflow-x: hidden;
             transition: background-color 0.5s ease, color 0.5s ease;
-            
-            /* --- EFECTO BLOOM GENERAL --- */
             text-shadow: 0 0 4px rgba(var(--primary-rgb), 0.4);
         }
 
-        /* --- EFECTO BLOOM INTENSO --- */
         h1, h2, h3, .font-orbitron, .text-tron-primary, .expand-text {
-            text-shadow: 
-                0 0 5px rgba(255, 255, 255, 0.8),
-                0 0 15px var(--primary-color),
-                0 0 25px rgba(var(--primary-rgb), 0.6);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 15px var(--primary-color), 0 0 25px rgba(var(--primary-rgb), 0.6);
         }
 
-        /* FONDO DE RED DINÁMICO */
         .the-grid {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background-image: 
-                linear-gradient(rgba(var(--primary-rgb), 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(var(--primary-rgb), 0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-            background-position: center top;
+            background-image: linear-gradient(rgba(var(--primary-rgb), 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--primary-rgb), 0.1) 1px, transparent 1px);
+            background-size: 50px 50px; background-position: center top;
             transform: perspective(500px) rotateX(60deg) translateY(-100px) scale(1.5);
-            opacity: 0.6;
-            z-index: -1;
-            pointer-events: none;
-            animation: moveGrid 20s linear infinite;
+            opacity: 0.6; z-index: -1; pointer-events: none; animation: moveGrid 20s linear infinite;
             transition: all 0.5s ease;
         }
 
-        @keyframes moveGrid {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 50px; }
-        }
+        @keyframes moveGrid { 0% { background-position: 0 0; } 100% { background-position: 0 50px; } }
 
-        /* RECORTE ANGULAR */
-        .clip-tron {
-            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-        }
+        .clip-tron { clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
 
-        .border-glow:hover { 
-            box-shadow: 0 0 15px var(--primary-color), inset 0 0 10px rgba(var(--primary-rgb), 0.2); 
-            border-color: var(--primary-color);
-        }
-
-        /* SIDEBAR */
-        .sidebar-container {
-            width: 4.5rem; 
-            transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            border-right: 1px solid rgba(var(--primary-rgb), 0.3);
-        }
-        .sidebar-container:hover {
-            width: 18rem; 
-        }
+        .sidebar-container { width: 4.5rem; transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1); border-right: 1px solid rgba(var(--primary-rgb), 0.3); }
+        .sidebar-container:hover { width: 18rem; }
 
         .expand-text {
             opacity: 0; max-width: 0; margin-left: 0; overflow: hidden;
@@ -132,29 +97,15 @@
         }
         .sidebar-container:hover .expand-text { opacity: 1; max-width: 180px; margin-left: 0.75rem; }
 
-        /* SCROLLBAR */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: var(--primary-color); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-
-        /* LABELS */
         .label-tron {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--primary-color);
-            font-size: 0.7rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            border-bottom: 1px solid rgba(var(--primary-rgb), 0.3);
-            margin-bottom: 4px;
-            display: inline-block;
+            font-family: 'Orbitron', sans-serif; color: var(--primary-color);
+            font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase;
+            border-bottom: 1px solid rgba(var(--primary-rgb), 0.3); margin-bottom: 4px; display: inline-block;
             text-shadow: 0 0 8px var(--primary-color);
         }
         .value-tron { font-family: 'Rajdhani', sans-serif; color: #fff; font-size: 1rem; }
 
-        /* DISCO CIRCULAR DINÁMICO */
         .disc-ring { border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-sizing: border-box; transition: border-color 0.5s ease, box-shadow 0.5s ease; }
-        
         .ring-1 { width: 100%; height: 100%; border: 3px solid var(--primary-color); box-shadow: 0 0 15px var(--primary-color), inset 0 0 10px var(--primary-color); }
         .ring-2 { width: 88%; height: 88%; border: 1px dashed rgba(255, 255, 255, 0.5); animation: rotate-center-reverse 20s linear infinite; }
         .ring-3 { width: 112%; height: 112%; border-top: 2px solid transparent; border-right: 2px solid var(--primary-color); border-bottom: 2px solid transparent; border-left: 2px solid var(--primary-color); animation: rotate-center 6s linear infinite; opacity: 0.8; }
@@ -163,11 +114,10 @@
         @keyframes rotate-center { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
         @keyframes rotate-center-reverse { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
 
-        /* MODAL */
-        .modal-enter { animation: modalIn 0.3s ease-out forwards; }
-        .modal-exit { animation: modalOut 0.3s ease-in forwards; }
-        @keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        @keyframes modalOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.9); } }
+        /* Estilos personalizados para scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #000; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
     </style>
 </head>
 <body id="main-body">
@@ -184,8 +134,7 @@
                     <h3 class="text-tron-primary font-orbitron tracking-widest text-lg">VISOR DE DATOS</h3>
                 </div>
                 <div class="flex items-center gap-4">
-                    <!-- Botón de recarga para fallos de Render -->
-                    <button onclick="reloadCurrentPreview()" class="text-gray-400 hover:text-tron-primary transition" title="Recargar documento">
+                    <button onclick="reloadCurrentPreview()" class="text-gray-400 hover:text-tron-primary transition" title="Recargar">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                     <button onclick="closePreview()" class="text-gray-400 hover:text-white hover:bg-tron-primary/20 w-8 h-8 flex items-center justify-center rounded-full transition border border-transparent hover:border-tron-primary">
@@ -208,8 +157,8 @@
                 <iframe id="preview-frame" src="" class="hidden w-full h-full border border-tron-primary/20 relative z-10 bg-white"></iframe>
                 
                 <!-- Visor Imagen con SCROLLBARS -->
-                <div id="image-container" class="hidden w-full h-full relative z-10 overflow-auto p-4 custom-scrollbar">
-                    <img id="preview-image" src="" class="shadow-2xl border border-tron-primary/20 bg-black/50 block mx-auto">
+                <div id="image-container" class="hidden w-full h-full relative z-10 flex items-center justify-center overflow-auto p-4 custom-scrollbar">
+                    <img id="preview-image" src="" class="shadow-2xl border border-tron-primary/20 bg-black/50 block mx-auto max-w-none">
                 </div>
             </div>
 
@@ -705,7 +654,7 @@
 
             <!-- Footer -->
             <footer class="text-center text-gray-600 text-xs font-mono mt-20 pt-10 border-t border-gray-900 mb-10">
-                <p class="mb-2 tracking-[0.5em] font-orbitron">Hoja de Vida</p>
+                <p class="mb-2 tracking-[0.5em] font-orbitron">END OF LINE</p>
                 <p class="font-rajdhani">&copy; {% now "Y" %} {{ perfil.nombres|default:"USUARIO" }} {{ perfil.apellidos|default:"DESCONOCIDO" }}. SISTEMA SECURE.</p>
             </footer>
 
@@ -748,35 +697,35 @@
             modal.classList.remove('hidden');
             loader.classList.remove('hidden');
             
+            // Limpieza previa del visor
+            frame.classList.add('hidden');
+            imgContainer.classList.add('hidden');
+            frame.src = '';
+            img.src = '';
+
             // DETECCIÓN MEJORADA DE TIPO DE ARCHIVO
-            // Limpia parámetros de URL de Cloudinary para ver la extensión real
             const cleanUrl = url.toLowerCase().split(/[?#]/)[0];
             const isPdf = cleanUrl.endsWith('.pdf');
             
-            if (!isPdf) {
-                // MODO IMAGEN: Tamaño Adaptativo con SCROLL
-                frame.classList.add('hidden');
+            // LÓGICA DE TAMAÑO UNIFICADA (misma lógica para ambos)
+            content.classList.remove('w-full', 'max-w-5xl', 'h-[85vh]');
+            content.classList.add('w-auto', 'max-w-[95vw]', 'max-h-[90vh]');
+
+            if (isPdf) {
+                // MODO DOCUMENTO: Usamos el visor de Google para evitar errores en Render/Cloudinary
+                frame.classList.remove('hidden');
+                
+                // El visor de Google Docs es la forma más estable de mostrar PDFs desde Render
+                const googleViewer = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true&t=${Date.now()}`;
+                frame.src = googleViewer;
+                
+                frame.onload = () => loader.classList.add('hidden');
+            } else {
+                // MODO IMAGEN: Tamaño natural con scrollbars si es grande
                 imgContainer.classList.remove('hidden');
                 img.src = url;
                 
-                // Ajustamos el modal para que no se coma las barras si la foto es enorme
-                content.classList.remove('w-full', 'max-w-5xl', 'h-[85vh]');
-                content.classList.add('w-auto', 'max-w-[90vw]', 'max-h-[90vh]');
-                
                 img.onload = () => loader.classList.add('hidden');
-            } else {
-                // MODO PDF: Tamaño Estándar + Cache Busting para Render
-                imgContainer.classList.add('hidden');
-                frame.classList.remove('hidden');
-                
-                // Agregamos timestamp para forzar al servidor a no usar cache antigua tras inactividad
-                const cacheBuster = url.includes('?') ? `&t=${Date.now()}` : `?t=${Date.now()}`;
-                frame.src = url + cacheBuster;
-                
-                content.classList.add('w-full', 'max-w-5xl', 'h-[85vh]');
-                content.classList.remove('w-auto', 'max-w-[90vw]', 'max-h-[90vh]');
-                
-                frame.onload = () => loader.classList.add('hidden');
             }
             
             document.getElementById('download-link').href = url;
@@ -784,7 +733,6 @@
 
         function reloadCurrentPreview() {
             if (lastUsedUrl) {
-                // Reiniciamos cargando
                 document.getElementById('preview-loader').classList.remove('hidden');
                 openPreview(lastUsedUrl);
             }
@@ -800,4 +748,4 @@
         document.getElementById('preview-modal').addEventListener('click', function(e) { if (e.target === this) closePreview(); });
     </script>
 </body>
-</html> eof
+</html> 
