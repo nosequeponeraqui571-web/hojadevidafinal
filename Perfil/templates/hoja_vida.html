@@ -174,10 +174,11 @@
 
     <div class="the-grid"></div>
 
-    <!-- MODAL PREVISUALIZADOR -->
+    <!-- MODAL PREVISUALIZADOR ADAPTATIVO -->
     <div id="preview-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 md:p-8">
-        <div id="modal-content" class="relative w-full max-w-5xl h-[85vh] bg-black border border-tron-primary shadow-neon flex flex-col clip-tron transform transition-all">
-            <div class="flex justify-between items-center p-4 border-b border-tron-primary/30 bg-tron-primary/10">
+        <div id="modal-content" class="relative bg-black border border-tron-primary shadow-neon flex flex-col clip-tron transition-all duration-500 ease-in-out overflow-hidden">
+            <!-- Header -->
+            <div class="flex justify-between items-center p-4 border-b border-tron-primary/30 bg-tron-primary/10 shrink-0">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-eye text-tron-primary animate-pulse-glow"></i>
                     <h3 class="text-tron-primary font-orbitron tracking-widest text-lg">VISOR DE DATOS</h3>
@@ -186,13 +187,25 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <div class="flex-1 p-1 bg-black/80 relative overflow-hidden">
-                <div class="absolute inset-0 flex items-center justify-center z-0">
+
+            <!-- Contenedor de Contenido -->
+            <div class="flex-1 p-1 bg-black/80 relative flex items-center justify-center overflow-hidden">
+                <!-- Loader -->
+                <div id="preview-loader" class="absolute inset-0 flex items-center justify-center z-0">
                     <div class="w-16 h-16 border-4 border-tron-primary border-t-transparent rounded-full animate-spin"></div>
                 </div>
-                <iframe id="preview-frame" src="" class="w-full h-full border border-tron-primary/20 relative z-10 bg-white"></iframe>
+                
+                <!-- Visor PDF -->
+                <iframe id="preview-frame" src="" class="hidden w-full h-full border border-tron-primary/20 relative z-10 bg-white"></iframe>
+                
+                <!-- Visor Imagen -->
+                <div id="image-container" class="hidden w-full h-full relative z-10 flex items-center justify-center overflow-auto p-2">
+                    <img id="preview-image" src="" class="max-w-full max-h-full object-contain shadow-2xl border border-tron-primary/20 bg-black/50">
+                </div>
             </div>
-            <div class="p-2 border-t border-tron-primary/30 bg-black flex justify-end">
+
+            <!-- Footer -->
+            <div class="p-2 border-t border-tron-primary/30 bg-black flex justify-end shrink-0">
                 <a id="download-link" href="#" target="_blank" class="text-xs font-mono text-tron-primary hover:text-white flex items-center gap-2 px-4 py-2 border border-tron-primary/30 hover:bg-tron-primary/10 transition">
                     <i class="fas fa-external-link-alt"></i> ABRIR EN VENTANA EXTERNA
                 </a>
@@ -721,16 +734,53 @@
         });
 
         function openPreview(url) {
-            document.getElementById('preview-modal').classList.remove('hidden');
-            document.getElementById('preview-frame').src = url;
+            const modal = document.getElementById('preview-modal');
+            const content = document.getElementById('modal-content');
+            const frame = document.getElementById('preview-frame');
+            const imgContainer = document.getElementById('image-container');
+            const img = document.getElementById('preview-image');
+            const loader = document.getElementById('preview-loader');
+            
+            modal.classList.remove('hidden');
+            loader.classList.remove('hidden');
+            
+            // Detectar extensión (muy básico, puedes mejorarlo con regex o verificando mimetype si lo tienes)
+            const isImage = url.match(/\.(jpeg|jpg|gif|png|webp)$/i) || url.includes('image/upload');
+            
+            if (isImage) {
+                // Configuración para FOTOS (Adaptable)
+                frame.classList.add('hidden');
+                imgContainer.classList.remove('hidden');
+                img.src = url;
+                
+                // Clases de tamaño adaptable
+                content.classList.remove('w-full', 'max-w-5xl', 'h-[85vh]');
+                content.classList.add('w-auto', 'max-w-[90vw]', 'max-h-[90vh]');
+                
+                img.onload = () => loader.classList.add('hidden');
+            } else {
+                // Configuración para PDF (Estándar)
+                imgContainer.classList.add('hidden');
+                frame.classList.remove('hidden');
+                frame.src = url;
+                
+                // Clases de tamaño fijo para lectura
+                content.classList.add('w-full', 'max-w-5xl', 'h-[85vh]');
+                content.classList.remove('w-auto', 'max-w-[90vw]', 'max-h-[90vh]');
+                
+                frame.onload = () => loader.classList.add('hidden');
+            }
+            
             document.getElementById('download-link').href = url;
         }
+
         function closePreview() {
             document.getElementById('preview-modal').classList.add('hidden');
             document.getElementById('preview-frame').src = '';
+            document.getElementById('preview-image').src = '';
         }
         document.addEventListener('keydown', function(event) { if (event.key === "Escape") closePreview(); });
         document.getElementById('preview-modal').addEventListener('click', function(e) { if (e.target === this) closePreview(); });
     </script>
 </body>
-</html>
+</html> eof
