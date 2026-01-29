@@ -87,6 +87,11 @@
 
         .clip-tron { clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
 
+        .border-glow:hover { 
+            box-shadow: 0 0 15px var(--primary-color), inset 0 0 10px rgba(var(--primary-rgb), 0.2); 
+            border-color: var(--primary-color);
+        }
+
         .sidebar-container { width: 4.5rem; transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1); border-right: 1px solid rgba(var(--primary-rgb), 0.3); }
         .sidebar-container:hover { width: 18rem; }
 
@@ -96,6 +101,16 @@
             transition: all 0.4s ease-in-out;
         }
         .sidebar-container:hover .expand-text { opacity: 1; max-width: 180px; margin-left: 0.75rem; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-color); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+
+        /* Scrollbars para el visor de fotos */
+        .custom-viewer-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+        .custom-viewer-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
+        .custom-viewer-scroll::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 5px; border: 2px solid #000; }
 
         .label-tron {
             font-family: 'Orbitron', sans-serif; color: var(--primary-color);
@@ -114,18 +129,18 @@
         @keyframes rotate-center { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
         @keyframes rotate-center-reverse { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
 
-        /* Estilos personalizados para scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #000; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
+        .modal-enter { animation: modalIn 0.3s ease-out forwards; }
+        .modal-exit { animation: modalOut 0.3s ease-in forwards; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes modalOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.9); } }
     </style>
 </head>
 <body id="main-body">
 
     <div class="the-grid"></div>
 
-    <!-- MODAL PREVISUALIZADOR ADAPTATIVO MEJORADO -->
-    <div id="preview-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 md:p-8">
+    <!-- MODAL PREVISUALIZADOR ADAPTATIVO CON SCROLL -->
+    <div id="preview-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/95 backdrop-blur-sm p-4 md:p-8">
         <div id="modal-content" class="relative bg-black border border-tron-primary shadow-neon flex flex-col clip-tron transition-all duration-500 ease-in-out overflow-hidden">
             <!-- Header -->
             <div class="flex justify-between items-center p-4 border-b border-tron-primary/30 bg-tron-primary/10 shrink-0">
@@ -149,23 +164,23 @@
                 <div id="preview-loader" class="absolute inset-0 flex items-center justify-center z-50 bg-black">
                     <div class="flex flex-col items-center gap-3">
                         <div class="w-16 h-16 border-4 border-tron-primary border-t-transparent rounded-full animate-spin"></div>
-                        <span class="text-tron-primary font-orbitron text-[10px] tracking-widest animate-pulse">ACCEDIENDO AL NÚCLEO...</span>
+                        <span class="text-tron-primary font-orbitron text-[10px] tracking-widest animate-pulse">SINCRONIZANDO...</span>
                     </div>
                 </div>
                 
-                <!-- Visor PDF -->
+                <!-- Visor PDF (Iframe) -->
                 <iframe id="preview-frame" src="" class="hidden w-full h-full border border-tron-primary/20 relative z-10 bg-white"></iframe>
                 
-                <!-- Visor Imagen con SCROLLBARS -->
-                <div id="image-container" class="hidden w-full h-full relative z-10 flex items-center justify-center overflow-auto p-4 custom-scrollbar">
-                    <img id="preview-image" src="" class="shadow-2xl border border-tron-primary/20 bg-black/50 block mx-auto max-w-none">
+                <!-- Visor Imagen con SCROLLBARS H/V -->
+                <div id="image-container" class="hidden w-full h-full relative z-10 flex items-center justify-center overflow-auto p-4 custom-viewer-scroll">
+                    <img id="preview-image" src="" class="max-w-none shadow-2xl border border-tron-primary/20 bg-black/50 block mx-auto">
                 </div>
             </div>
 
             <!-- Footer -->
             <div class="p-2 border-t border-tron-primary/30 bg-black flex justify-end shrink-0">
-                <a id="download-link" href="#" target="_blank" class="text-xs font-mono text-tron-primary hover:text-white flex items-center gap-2 px-4 py-2 border border-tron-primary/30 hover:bg-tron-primary/10 transition">
-                    <i class="fas fa-external-link-alt"></i> ABRIR EN VENTANA EXTERNA
+                <a id="download-link" href="#" target="_blank" class="text-xs font-mono text-tron-primary hover:text-white flex items-center gap-2 px-4 py-2 border border-tron-primary/30 hover:bg-tron-primary/10 transition uppercase tracking-widest">
+                    <i class="fas fa-external-link-alt"></i> Abrir externo
                 </a>
             </div>
         </div>
@@ -269,10 +284,7 @@
             
             <!-- HERO SECTION -->
             <section id="inicio" class="min-h-screen flex flex-col justify-center mb-20 relative">
-                
                 <div class="mb-12 pl-4 md:pl-8 relative flex flex-col md:flex-row items-center gap-12 md:gap-16">
-                    
-                    <!-- DISCO CIRCULAR DINÁMICO -->
                     <div class="relative w-64 h-64 flex-shrink-0 group cursor-pointer flex justify-center items-center">
                         <div class="disc-ring ring-4"></div> 
                         <div class="disc-ring ring-3"></div>
@@ -287,7 +299,6 @@
                         </div>
                     </div>
 
-                    <!-- TEXTO DE PRESENTACIÓN -->
                     <div class="text-center md:text-left border-l-0 md:border-l-8 border-tron-primary md:pl-10">
                         <h3 class="text-xl text-tron-primary font-orbitron mb-2 tracking-[0.4em] animate-pulse-glow">IDENTIDAD RECONOCIDA</h3>
                         <h1 class="text-6xl md:text-8xl font-black text-white uppercase mb-4 text-glow leading-tight font-orbitron">
@@ -300,7 +311,6 @@
                     </div>
                 </div>
 
-                <!-- Dashboard Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div class="bg-black/60 border border-tron-primary/30 p-8 clip-tron relative group transition-all duration-300 border-glow backdrop-blur-sm">
                         <div class="absolute top-0 right-0 p-4 opacity-30 group-hover:opacity-100 transition"><i class="fas fa-id-card text-5xl text-tron-primary"></i></div>
@@ -663,7 +673,7 @@
 
     <!-- Script del Previsualizador y Toggle de Tema -->
     <script>
-        let lastUsedUrl = "";
+        let lastPreviewUrl = "";
 
         function toggleTheme() {
             const body = document.getElementById('main-body');
@@ -686,7 +696,7 @@
         });
 
         function openPreview(url) {
-            lastUsedUrl = url;
+            lastPreviewUrl = url;
             const modal = document.getElementById('preview-modal');
             const content = document.getElementById('modal-content');
             const frame = document.getElementById('preview-frame');
@@ -697,44 +707,47 @@
             modal.classList.remove('hidden');
             loader.classList.remove('hidden');
             
-            // Limpieza previa del visor
+            // Limpieza de estados anteriores
             frame.classList.add('hidden');
             imgContainer.classList.add('hidden');
             frame.src = '';
             img.src = '';
 
-            // DETECCIÓN MEJORADA DE TIPO DE ARCHIVO
+            // DETECCIÓN DE TIPO DE ARCHIVO
             const cleanUrl = url.toLowerCase().split(/[?#]/)[0];
             const isPdf = cleanUrl.endsWith('.pdf');
             
-            // LÓGICA DE TAMAÑO UNIFICADA (misma lógica para ambos)
+            // LÓGICA DE TAMAÑO ADAPTATIVO UNIFICADA
             content.classList.remove('w-full', 'max-w-5xl', 'h-[85vh]');
             content.classList.add('w-auto', 'max-w-[95vw]', 'max-h-[90vh]');
 
             if (isPdf) {
-                // MODO DOCUMENTO: Usamos el visor de Google para evitar errores en Render/Cloudinary
+                // VISUALIZACIÓN DE PDF (Usa el visor de Google para evitar errores en Render)
                 frame.classList.remove('hidden');
-                
-                // El visor de Google Docs es la forma más estable de mostrar PDFs desde Render
-                const googleViewer = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true&t=${Date.now()}`;
-                frame.src = googleViewer;
+                // Timestamp para evitar cache corrupta tras inactividad
+                const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true&t=${Date.now()}`;
+                frame.src = googleViewerUrl;
                 
                 frame.onload = () => loader.classList.add('hidden');
             } else {
-                // MODO IMAGEN: Tamaño natural con scrollbars si es grande
+                // VISUALIZACIÓN DE IMAGEN (Con scrollbars si es grande)
                 imgContainer.classList.remove('hidden');
                 img.src = url;
                 
                 img.onload = () => loader.classList.add('hidden');
+                img.onerror = () => {
+                    loader.classList.add('hidden');
+                    alert("Error al cargar la imagen. Intente recargar.");
+                }
             }
             
             document.getElementById('download-link').href = url;
         }
 
         function reloadCurrentPreview() {
-            if (lastUsedUrl) {
+            if (lastPreviewUrl) {
                 document.getElementById('preview-loader').classList.remove('hidden');
-                openPreview(lastUsedUrl);
+                openPreview(lastPreviewUrl);
             }
         }
 
@@ -748,4 +761,4 @@
         document.getElementById('preview-modal').addEventListener('click', function(e) { if (e.target === this) closePreview(); });
     </script>
 </body>
-</html> 
+</html> eof
