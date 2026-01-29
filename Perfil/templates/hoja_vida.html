@@ -12,7 +12,7 @@
     <!-- Fuentes Futuristas -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Iconos FontAwesome -->
+    <!-- Iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script>
@@ -22,6 +22,7 @@
                     colors: {
                         tron: {
                             bg: '#000000',
+                            // Color dinámico vinculado a variable CSS
                             primary: 'var(--primary-color)', 
                             dim: 'rgba(var(--primary-rgb), 0.1)',
                             white: '#e0faff',
@@ -33,6 +34,7 @@
                         rajdhani: ['Rajdhani', 'sans-serif'],
                     },
                     boxShadow: {
+                        // Sombras dinámicas
                         'neon': '0 0 5px var(--primary-color), 0 0 20px var(--primary-color)',
                         'hud': 'inset 0 0 20px rgba(var(--primary-rgb), 0.15)',
                     },
@@ -47,6 +49,7 @@
     </script>
 
     <style>
+        /* DEFINICIÓN DE TEMAS */
         :root {
             /* TEMA LEGACY (Por defecto) */
             --primary-color: #00f3ff;
@@ -67,9 +70,12 @@
             font-family: 'Rajdhani', sans-serif;
             overflow-x: hidden;
             transition: background-color 0.5s ease, color 0.5s ease;
+            
+            /* --- EFECTO BLOOM GENERAL --- */
             text-shadow: 0 0 4px rgba(var(--primary-rgb), 0.4);
         }
 
+        /* --- EFECTO BLOOM INTENSO --- */
         h1, h2, h3, .font-orbitron, .text-tron-primary, .expand-text {
             text-shadow: 
                 0 0 5px rgba(255, 255, 255, 0.8),
@@ -99,6 +105,7 @@
             100% { background-position: 0 50px; }
         }
 
+        /* RECORTE ANGULAR */
         .clip-tron {
             clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
         }
@@ -108,6 +115,7 @@
             border-color: var(--primary-color);
         }
 
+        /* SIDEBAR */
         .sidebar-container {
             width: 4.5rem; 
             transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
@@ -124,11 +132,13 @@
         }
         .sidebar-container:hover .expand-text { opacity: 1; max-width: 180px; margin-left: 0.75rem; }
 
+        /* SCROLLBAR */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: var(--primary-color); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
 
+        /* LABELS */
         .label-tron {
             font-family: 'Orbitron', sans-serif;
             color: var(--primary-color);
@@ -142,7 +152,9 @@
         }
         .value-tron { font-family: 'Rajdhani', sans-serif; color: #fff; font-size: 1rem; }
 
+        /* DISCO CIRCULAR DINÁMICO */
         .disc-ring { border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-sizing: border-box; transition: border-color 0.5s ease, box-shadow 0.5s ease; }
+        
         .ring-1 { width: 100%; height: 100%; border: 3px solid var(--primary-color); box-shadow: 0 0 15px var(--primary-color), inset 0 0 10px var(--primary-color); }
         .ring-2 { width: 88%; height: 88%; border: 1px dashed rgba(255, 255, 255, 0.5); animation: rotate-center-reverse 20s linear infinite; }
         .ring-3 { width: 112%; height: 112%; border-top: 2px solid transparent; border-right: 2px solid var(--primary-color); border-bottom: 2px solid transparent; border-left: 2px solid var(--primary-color); animation: rotate-center 6s linear infinite; opacity: 0.8; }
@@ -150,7 +162,8 @@
 
         @keyframes rotate-center { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
         @keyframes rotate-center-reverse { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(-360deg); } }
-        
+
+        /* MODAL */
         .modal-enter { animation: modalIn 0.3s ease-out forwards; }
         .modal-exit { animation: modalOut 0.3s ease-in forwards; }
         @keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
@@ -192,13 +205,16 @@
         <!-- SIDEBAR -->
         <aside class="sidebar-container bg-black/90 backdrop-blur-xl flex flex-col md:fixed md:h-screen z-50 overflow-x-hidden no-scrollbar group shadow-none transition-shadow duration-500 hover:shadow-neon">
             
+            <!-- CABECERA DE PERFIL + BOTÓN DE CAMBIO -->
             <div class="h-14 flex items-center justify-center border-b border-tron-primary/20 bg-gradient-to-r from-tron-primary/10 to-transparent overflow-hidden relative">
+                <!-- Botón Switcher -->
                 <button onclick="toggleTheme()" class="w-full h-full flex items-center justify-center group/btn focus:outline-none" title="Cambiar Tema (Legacy/Ares)">
                     <i id="theme-icon" class="fas fa-microchip text-tron-primary text-xl transition-all duration-500 group-hover/btn:rotate-180 group-hover/btn:scale-125 animate-pulse-glow"></i>
                     <span class="absolute bottom-1 text-[8px] text-tron-primary opacity-0 group-hover/btn:opacity-100 transition-opacity font-orbitron tracking-widest">SWITCH</span>
                 </button>
             </div>
 
+            <!-- NAVEGACIÓN -->
             <nav class="flex-1 px-1 md:px-2 py-4 space-y-3">
                 {% if perfil.archivo_cv %}
                 <div class="flex flex-col gap-1 mb-2 group/cv-container">
@@ -209,6 +225,7 @@
                 </div>
                 {% endif %}
 
+                <!-- Generar PDF -->
                 <div class="flex flex-col gap-1 mb-8 group/cv-gen">
                     <a href="{% url 'exportar_cv' %}" target="_blank" class="flex items-center px-3 py-3 clip-tron bg-white/5 border-l-4 border-white text-white hover:bg-white hover:text-black transition-all duration-300 shadow-hud overflow-hidden whitespace-nowrap w-full text-left">
                         <i class="fas fa-print text-lg min-w-[24px] text-center flex-shrink-0 text-white group-hover:text-black"></i> 
@@ -288,6 +305,7 @@
                 
                 <div class="mb-12 pl-4 md:pl-8 relative flex flex-col md:flex-row items-center gap-12 md:gap-16">
                     
+                    <!-- DISCO CIRCULAR DINÁMICO -->
                     <div class="relative w-64 h-64 flex-shrink-0 group cursor-pointer flex justify-center items-center">
                         <div class="disc-ring ring-4"></div> 
                         <div class="disc-ring ring-3"></div>
@@ -302,6 +320,7 @@
                         </div>
                     </div>
 
+                    <!-- TEXTO DE PRESENTACIÓN -->
                     <div class="text-center md:text-left border-l-0 md:border-l-8 border-tron-primary md:pl-10">
                         <h3 class="text-xl text-tron-primary font-orbitron mb-2 tracking-[0.4em] animate-pulse-glow">IDENTIDAD RECONOCIDA</h3>
                         <h1 class="text-6xl md:text-8xl font-black text-white uppercase mb-4 text-glow leading-tight font-orbitron">
@@ -422,6 +441,13 @@
                             <div class="label-tron">Email Contacto</div>
                             <div class="value-tron">{{ perfil.email_contacto|default:"" }}</div>
                         </div>
+                        {% if perfil.archivo_cv %}
+                        <div class="col-span-full mt-4">
+                            <button onclick="openPreview('{{ perfil.archivo_cv.url }}')" class="inline-flex items-center gap-2 text-sm text-black bg-tron-primary px-6 py-2 hover:bg-white hover:text-black transition uppercase font-bold tracking-widest clip-tron font-orbitron">
+                                <i class="fas fa-eye"></i> Previsualizar CV
+                            </button>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </section>
@@ -551,11 +577,19 @@
                 </div>
                 <div class="grid md:grid-cols-2 gap-8">
                     {% for prod in productos_academicos %}
-                    <div class="p-6 bg-tron-panel border border-white/20 hover:border-white transition-all duration-300 shadow-neon-white clip-tron h-full flex flex-col">
-                        <!-- IMAGEN DEL PRODUCTO (Nueva Sección) -->
+                    <div class="p-6 bg-tron-panel border border-white/20 hover:border-white transition-all duration-300 shadow-neon-white clip-tron h-full flex flex-col group">
+                        
+                        <!-- IMAGEN PREVIA (Estilo Mejorado) -->
                         {% if prod.imagen_producto %}
-                        <div class="w-full h-40 mb-4 overflow-hidden border border-white/10 relative group-hover:border-white transition-colors clip-tron">
-                            <img src="{{ prod.imagen_producto.url }}" alt="{{ prod.nombrerecurso }}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300">
+                        <div class="w-full h-56 mb-4 overflow-hidden border border-white/10 relative clip-tron bg-black/50">
+                            <!-- Overlay al hacer hover -->
+                            <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer" onclick="openPreview('{{ prod.imagen_producto.url }}')">
+                                <span class="text-white font-orbitron tracking-widest border border-white px-4 py-2 hover:bg-white hover:text-black transition">
+                                    <i class="fas fa-expand me-2"></i> AMPLIAR
+                                </span>
+                            </div>
+                            <!-- Imagen ajustada para cubrir pero centrada -->
+                            <img src="{{ prod.imagen_producto.url }}" alt="{{ prod.nombrerecurso }}" class="w-full h-full object-cover object-top opacity-90 group-hover:scale-110 transition-transform duration-700">
                         </div>
                         {% endif %}
                         
@@ -565,6 +599,15 @@
                         </div>
                         <span class="inline-block bg-white/10 text-white text-[10px] px-2 py-1 mt-1 mb-4 uppercase font-orbitron self-start">{{ prod.clasificador|default:"" }}</span>
                         <p class="text-gray-200 text-sm border-t border-white/10 pt-4 font-rajdhani flex-grow">{{ prod.descripcion|default:"" }}</p>
+                        
+                        <!-- BOTÓN VISUALIZAR (Igual que certificados) -->
+                        {% if prod.imagen_producto %}
+                        <div class="mt-6">
+                            <button onclick="openPreview('{{ prod.imagen_producto.url }}')" class="w-full block text-center py-3 bg-white/5 border border-white text-white text-sm hover:bg-white hover:text-black transition uppercase font-bold tracking-widest clip-tron font-orbitron">
+                                <i class="fas fa-eye mr-2"></i> Visualizar Recurso
+                            </button>
+                        </div>
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>
