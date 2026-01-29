@@ -3,10 +3,8 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 
-
 class DatosPersonales(models.Model):
     idperfil = models.IntegerField(primary_key=True, validators=[MinValueValidator(1)])
-    # Aumentado max_length a 255
     fotoperfil = models.ImageField(upload_to='perfil/', null=True, blank=True, max_length=255)
     email_contacto = models.EmailField(max_length=100, null=True, blank=True)
     descripcionperfil = models.CharField(max_length=300)
@@ -38,7 +36,6 @@ class DatosPersonales(models.Model):
     class Meta:
         verbose_name_plural = "Datos Personales"
 
-
 class ExperienciaLaboral(models.Model):
     idexperiencilaboral = models.IntegerField(primary_key=True, validators=[MinValueValidator(1)])
     idperfilconqueestaactivo = models.ForeignKey(DatosPersonales, on_delete=models.CASCADE)
@@ -53,7 +50,6 @@ class ExperienciaLaboral(models.Model):
     fechafingestion = models.DateField(blank=True, null=True)
     descripcionfunciones = models.TextField()
     activarparaqueseveaenfront = models.BooleanField(default=True)
-    # Aumentado max_length a 255
     rutacertificado = models.FileField(upload_to='certificados/experiencia/', blank=True, null=True, max_length=255)
 
     def clean(self):
@@ -83,7 +79,6 @@ class Reconocimientos(models.Model):
     nombrecontactoauspicia = models.CharField(max_length=300)
     telefonocontactoauspicia = models.CharField(max_length=100)
     activarparaqueseveaenfront = models.BooleanField(default=True)
-    # Aumentado max_length a 255
     rutacertificado = models.FileField(upload_to='reconocimientos/', null=True, blank=True, max_length=255)
 
     def clean(self):
@@ -107,7 +102,6 @@ class CursosRealizados(models.Model):
     telefonocontactoauspicia = models.CharField(max_length=60)
     emailempresapatrocinadora = models.EmailField(max_length=150)
     activarparaqueseveaenfront = models.BooleanField(default=True)
-    # Aumentado max_length a 255
     rutacertificado = models.FileField(upload_to='certificados/cursos/', blank=True, null=True, max_length=255)
 
     def clean(self):
@@ -129,8 +123,9 @@ class ProductosAcademicos(models.Model):
     nombrerecurso = models.CharField(max_length=200)
     clasificador = models.CharField(max_length=100)
     descripcion = models.TextField()
-    # Aumentado max_length a 255
+    # --- CAMPO AGREGADO ---
     imagen_producto = models.ImageField(upload_to='academicos/', null=True, blank=True, verbose_name="Imagen Representativa", max_length=255)
+    # ----------------------
     activarparaqueseveaenfront = models.BooleanField(default=True)
 
     def __str__(self):
@@ -155,12 +150,10 @@ class ProductosLaborales(models.Model):
 
 class VentaGarage(models.Model):
     ESTADO_CHOICES = [('Bueno', 'Bueno'), ('Regular', 'Regular')]
-    # ID mayor a 0
     idventagarage = models.IntegerField(primary_key=True, validators=[MinValueValidator(1)])
     idperfilconqueestaactivo = models.ForeignKey(DatosPersonales, on_delete=models.CASCADE)
     nombreproducto = models.CharField(max_length=100)
     estadoproducto = models.CharField(max_length=40, choices=ESTADO_CHOICES)
-    # Aumentado max_length a 255 en ambos campos
     foto_producto = models.ImageField(upload_to='garage/fotos/', null=True, blank=True, verbose_name="Foto para la Web", max_length=255)
     documento_interes = models.FileField(upload_to='garage/documentos/', null=True, blank=True, verbose_name="PDF solo para el CV", max_length=255)
     descripcion = models.TextField()
