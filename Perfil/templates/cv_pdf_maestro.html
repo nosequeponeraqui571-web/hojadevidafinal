@@ -3,242 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        /* --- CONFIGURACIÓN DE PÁGINA --- */
         @page {
             size: letter;
             margin: 2cm;
+            @frame footer_frame {           /* Static Frame */
+                -pdf-frame-content: footerContent;
+                bottom: 1cm;
+                margin-left: 1cm;
+                margin-right: 1cm;
+                height: 1cm;
+            }
         }
 
         body {
             font-family: Helvetica, Arial, sans-serif;
             color: #000;
-            line-height: 1.3;
+            line-height: 1.4;
             font-size: 10pt;
         }
 
         /* --- ENCABEZADO --- */
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
         }
 
         .name {
-            font-size: 26pt;
+            font-size: 24pt;
             font-weight: bold;
             text-transform: uppercase;
+            color: #1a202c; /* Gris muy oscuro */
             margin-bottom: 5px;
         }
 
         .contact-info {
             font-size: 9pt;
-            color: #333;
-        }
-
-        hr {
-            border: 0;
-            border-top: 1px solid #000;
-            margin: 15px 0;
+            color: #4a5568; /* Gris medio */
         }
 
         /* --- SECCIONES --- */
         .section-title {
-            font-size: 12pt;
+            font-size: 13pt;
             font-weight: bold;
             text-transform: uppercase;
-            margin-top: 15px;
+            color: #2d3748;
+            margin-top: 20px;
             margin-bottom: 10px;
-            border-bottom: 0.5pt solid #eee;
+            border-bottom: 1px solid #cbd5e0;
             padding-bottom: 3px;
         }
 
-        .summary-text {
-            text-align: justify;
-            margin-bottom: 15px;
-            font-style: italic;
-            color: #333;
+        /* --- ITEMS (Experiencia / Cursos) --- */
+        .item-block {
+            margin-bottom: 12px;
+            page-break-inside: avoid; /* Evita que un item se corte a mitad de página */
         }
 
-        /* --- DATOS PERSONALES --- */
-        .personal-data {
-            margin-bottom: 15px;
-        }
-        .personal-data p {
-            margin: 2px 0;
-            font-size: 9.5pt;
-        }
-
-        /* --- ITEMS --- */
-        .item-row {
-            margin-bottom: 15px;
-        }
-
-        .item-header-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 3px;
-        }
-
-        .item-main-title {
+        .item-header {
             font-weight: bold;
             font-size: 11pt;
-            text-align: left;
+            color: #000;
         }
 
-        .item-right-info {
+        .item-sub {
             font-size: 9pt;
-            text-align: right;
-            color: #555;
+            color: #4a5568;
+            margin-top: 1px;
+            margin-bottom: 3px;
+            font-style: italic;
         }
 
-        .item-subtitle {
-            font-weight: normal;
-            font-size: 10pt;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        /* Listas de funciones */
-        .bullet-list {
-            margin: 0;
-            padding-left: 20px;
-        }
-
-        .bullet-list li {
-            margin-bottom: 4px;
+        .item-desc {
             text-align: justify;
+            margin-top: 2px;
+            font-size: 10pt;
         }
 
-        .page-break { display: block; page-break-before: always; }
+        /* Listas limpias */
+        ul { margin: 5px 0; padding-left: 15px; }
+        li { margin-bottom: 2px; }
 
-        /* Estilo para los certificados adjuntos al final */
+        /* --- UTILIDADES --- */
+        .page-break { page-break-after: always; }
+        
         .anexo-page {
+            display: block;
             text-align: center;
-            padding-top: 8cm;
+            margin-top: 40%;
         }
         .anexo-box {
-            border: 2pt solid #000;
-            padding: 40px;
+            border: 2px solid #000;
+            padding: 30px;
             display: inline-block;
         }
     </style>
 </head>
 <body>
 
-    <!-- ENCABEZADO CENTRADO -->
+    <!-- ENCABEZADO -->
     <div class="header">
         <div class="name">{{ perfil.nombres }} {{ perfil.apellidos }}</div>
         <div class="contact-info">
-            {{ perfil.direcciondomiciliaria }}<br>
-            Cédula: {{ perfil.numerocedula }} | {{ perfil.nacionalidad }}<br>
-            Tel: {{ perfil.telefonofijo|default:perfil.telefonoconvencional }} | Email: {{ perfil.email_contacto }}<br>
-            {% if perfil.sitioweb %}{{ perfil.sitioweb }}{% endif %}
+            C.I: {{ perfil.numerocedula }} | {{ perfil.email_contacto }}<br>
+            {{ perfil.telefonofijo }} | {{ perfil.direcciondomiciliaria }}
         </div>
     </div>
 
-    <hr>
-
-    <!-- RESUMEN / ACERCA DE MÍ -->
-    <div class="summary-text">
+    <!-- PERFIL -->
+    <div class="section-title">Perfil Profesional</div>
+    <div style="text-align: justify; margin-bottom: 10px;">
         {{ perfil.descripcionperfil }}
     </div>
 
-    <!-- DATOS PERSONALES ADICIONALES -->
-    <div class="section-title">Información Personal</div>
-    <div class="personal-data">
-        <p><strong>Fecha de Nacimiento:</strong> {{ perfil.fechanacimiento|date:"d \d\e F \d\e Y" }}</p>
-        <p><strong>Lugar de Nacimiento:</strong> {{ perfil.lugarnacimiento }}</p>
-        <p><strong>Estado Civil:</strong> {{ perfil.estadocivil }}</p>
-    </div>
-
-    <!-- EXPERIENCIA PROFESIONAL -->
+    <!-- EXPERIENCIA LABORAL -->
     {% if incl_experiencia and items %}
     <div class="section-title">Experiencia Profesional</div>
     {% for exp in items %}
-        <div class="item-row">
-            <table class="item-header-table">
-                <tr>
-                    <td class="item-main-title">{{ exp.nombrempresa|upper }}, {{ exp.lugarempresa }}</td>
-                    <td class="item-right-info">
-                        {{ exp.fechainiciogestion|date:"M Y" }} – 
-                        {% if exp.fechafingestion %}{{ exp.fechafingestion|date:"M Y" }}{% else %}A la fecha{% endif %}
-                    </td>
-                </tr>
-            </table>
-            <div class="item-subtitle">{{ exp.cargodesempenado }}</div>
-            <ul class="bullet-list">
-                <li>{{ exp.descripcionfunciones }}</li>
-            </ul>
+    <div class="item-block">
+        <div class="item-header">{{ exp.cargodesempenado }}</div>
+        <div class="item-sub">
+            {{ exp.nombrempresa }} | {{ exp.lugarempresa }} 
+            <!-- FECHAS A LA DERECHA (O INTEGRADOS) -->
+            &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
+            {{ exp.fechainiciogestion|date:"M Y" }} - 
+            {% if exp.fechafingestion %}
+                {{ exp.fechafingestion|date:"M Y" }}
+            {% else %}
+                Actualidad
+            {% endif %}
         </div>
+        <div class="item-desc">
+            {{ exp.descripcionfunciones|linebreaksbr }}
+        </div>
+    </div>
     {% endfor %}
     {% endif %}
 
-    <!-- EDUCACIÓN Y CURSOS -->
+    <!-- EDUCACIÓN Y FORMACIÓN (CURSOS) -->
     {% if incl_cursos and cursos %}
     <div class="section-title">Educación y Formación</div>
     {% for curso in cursos %}
-        <div class="item-row">
-            <table class="item-header-table">
-                <tr>
-                    <td class="item-main-title">{{ curso.entidadpatrocinadora|upper }}</td>
-                    <td class="item-right-info">{{ curso.fechafin|date:"Y" }}</td>
-                </tr>
-            </table>
-            <div class="item-subtitle">{{ curso.nombrecurso }} ({{ curso.totalhoras }} horas)</div>
+    <div class="item-block">
+        <div class="item-header">{{ curso.nombrecurso }}</div>
+        <div class="item-sub">
+            {{ curso.entidadpatrocinadora }}
+            &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+            {{ curso.fechainicio|date:"M Y" }} - {{ curso.fechafin|date:"M Y" }}
+            &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+            {{ curso.totalhoras }} Horas
         </div>
+        {% if curso.descripcioncurso %}
+        <div class="item-desc">{{ curso.descripcioncurso }}</div>
+        {% endif %}
+    </div>
     {% endfor %}
     {% endif %}
 
-    <!-- PROYECTOS -->
-    {% if incl_proy %}
-    {% if productos or productos_laborales %}
-    <div class="section-title">Proyectos y Productos</div>
-    {% for pl in productos_laborales %}
-        <div class="item-row">
-            <div class="item-main-title">• {{ pl.nombreproducto }} ({{ pl.fechaproducto|date:"Y" }})</div>
-            <div class="bullet-list" style="margin-left: 15px; font-size: 9pt; color: #444;">{{ pl.descripcion }}</div>
-        </div>
-    {% endfor %}
-    {% for pa in productos %}
-        <div class="item-row">
-            <div class="item-main-title">• {{ pa.nombrerecurso }} - {{ pa.clasificador }}</div>
-            <div class="bullet-list" style="margin-left: 15px; font-size: 9pt; color: #444;">{{ pa.descripcion }}</div>
-        </div>
-    {% endfor %}
-    {% endif %}
-    {% endif %}
-
-    <!-- RECONOCIMIENTOS -->
+    <!-- LOGROS -->
     {% if incl_logros and reconocimientos %}
     <div class="section-title">Logros y Reconocimientos</div>
     <ul class="bullet-list">
         {% for rec in reconocimientos %}
-            <li><strong>{{ rec.tiporeconocimiento }}:</strong> {{ rec.descripcionreconocimiento }} ({{ rec.entidadpatrocinadora }}, {{ rec.fechareconocimiento|date:"Y" }})</li>
+            <li>
+                <strong>{{ rec.tiporeconocimiento }}</strong> otorgado por {{ rec.entidadpatrocinadora }} ({{ rec.fechareconocimiento|date:"Y" }}).
+                <br><i>{{ rec.descripcionreconocimiento }}</i>
+            </li>
         {% endfor %}
     </ul>
     {% endif %}
 
-    <!-- VENTAS (Solo si se solicita) -->
+    <!-- PRODUCTOS ACADÉMICOS Y LABORALES SEPARADOS -->
+    {% if incl_proyectos %}
+        
+        <!-- SECCIÓN 1: PRODUCTOS ACADÉMICOS -->
+        {% if productos %}
+        <div class="section-title">Productos Académicos</div>
+        <ul>
+            {% for prod in productos %}
+            <li>
+                <strong>{{ prod.nombrerecurso }}</strong>: {{ prod.descripcion }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <!-- SECCIÓN 2: PRODUCTOS LABORALES -->
+        {% if productos_laborales %}
+        <div class="section-title">Productos Laborales</div>
+        <ul>
+            {% for prod in productos_laborales %}
+            <li>
+                <strong>{{ prod.nombreproducto }}</strong> ({{ prod.fechaproducto|date:"Y" }}): {{ prod.descripcion }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+    {% endif %}
+
+    <!-- GARAJE (Opcional) -->
     {% if incl_garage and garage %}
-    <div class="section-title">Catálogo Garage</div>
-    <ul class="bullet-list">
+    <div class="section-title">Venta de Garage</div>
+    <ul>
         {% for g in garage %}
             <li>{{ g.nombreproducto }} - ${{ g.valordelbien }} (Estado: {{ g.estadoproducto }})</li>
         {% endfor %}
     </ul>
     {% endif %}
 
-    <!-- PÁGINA DE PORTADA PARA ANEXOS -->
-    {% if incl_cursos or incl_logros or incl_experiencia or incl_garage %}
+    <!-- PORTADA DE ANEXOS -->
+    {% if incl_experiencia or incl_cursos or incl_logros or incl_garage %}
     <div class="page-break"></div>
     <div class="anexo-page">
         <div class="anexo-box">
-            <h1 style="font-size: 28pt; font-weight: bold; margin-bottom: 10px;">ANEXO</h1>
-            <h2 style="font-size: 16pt; font-weight: normal; text-transform: uppercase; letter-spacing: 2pt;">Documentación de Respaldo</h2>
-            <hr style="width: 50%; margin: 20px auto;">
-            <p style="font-size: 11pt; color: #555;">Los certificados y documentos detallados en este currículum<br>se adjuntan en su versión original a continuación.</p>
+            <h1 style="font-size: 24pt; margin: 0;">ANEXOS</h1>
+            <p style="margin-top: 10px;">Documentación de Respaldo</p>
         </div>
     </div>
     {% endif %}
 
+    <!-- FOOTER ESTÁTICO PARA NUMERACIÓN -->
+    <div id="footerContent" style="text-align: right; color: #888; font-size: 8pt;">
+        Página <pdf:pagenumber> de <pdf:pagecount>
+    </div>
+
 </body>
-</html> 
+</html>
