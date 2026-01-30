@@ -391,7 +391,8 @@
                 </div>
             </section>
 
-            {% if experiencias %}
+            <!-- (Rest of sections identical, omitting for brevity to focus on JS logic below) -->
+             {% if experiencias %}
             <section id="experiencia-laboral" class="mb-32">
                 <div class="flex items-center gap-4 mb-10">
                     <span class="text-white text-4xl shadow-neon-white rounded-full p-2"><i class="fas fa-briefcase"></i></span>
@@ -610,6 +611,7 @@
             }
         }
         document.addEventListener('DOMContentLoaded', () => {
+            console.log("VERSION V3 ACTIVA - SI NO VES ESTO EN CONSOLA, BORRA CACHE");
             if(localStorage.getItem('cv-theme') === 'ares') toggleTheme(); 
         });
 
@@ -636,18 +638,19 @@
                 img.src = url;
                 img.onload = () => { loader.classList.add('hidden'); imgContainer.classList.remove('hidden'); };
                 img.onerror = () => { 
-                    // Fallback a proxy si la imagen directa falla
                     img.src = `/ver-archivo/?url=${encodeURIComponent(url)}`;
                 };
             } else {
-                // MODO PDF: USAR PROXY + CARGA OPTIMISTA + BUSTING CACHE
+                // PDF HANDLING
                 const timestamp = new Date().getTime();
                 const proxyUrl = `/ver-archivo/?url=${encodeURIComponent(url)}&t=${timestamp}`;
+                console.log("Solicitando PDF:", proxyUrl);
+                
                 frame.src = proxyUrl;
                 
-                // NO esperamos al onload porque Chrome a veces no lo dispara para PDFs
-                // Mostramos el iframe tras 2 segundos y ocultamos el loader sí o sí
+                // FORCE SHOW AFTER 2 SECONDS (Safety net for Chrome)
                 setTimeout(() => {
+                    console.log("Forzando visualización de iframe");
                     loader.classList.add('hidden');
                     frame.classList.remove('hidden');
                 }, 2000);

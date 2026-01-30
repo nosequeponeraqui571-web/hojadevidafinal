@@ -1,7 +1,7 @@
 import io
 import requests
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, StreamingHttpResponse
+from django.http import HttpResponse
 from django.template.loader import get_template
 from django.views.decorators.clickjacking import xframe_options_exempt
 from xhtml2pdf import pisa
@@ -32,38 +32,40 @@ def home(request):
     }
     return render(request, 'hoja_vida.html', context)
 
-# --- VISTA TÚNEL CORREGIDA ---
+# --- VISTA TÚNEL VERSIÓN ROBUSTA ---
 @xframe_options_exempt
 def ver_archivo(request):
+    """
+    Descarga el archivo completo en memoria y lo sirve con Content-Length.
+    Esto es más compatible con visores PDF de navegadores que el Streaming.
+    """
     url = request.GET.get('url')
     if not url:
         return HttpResponse("No se proporcionó URL", status=400)
     
     try:
-        # Hacemos la petición a Cloudinary
-        response = requests.get(url, stream=True, timeout=15)
+        # Petición estándar (sin stream=True) para obtener todo el contenido
+        response = requests.get(url, timeout=20)
         
         if response.status_code == 200:
-            # Determinamos el tipo de contenido
             content_type = response.headers.get('Content-Type', '')
             
-            # Si Cloudinary no nos dice que es PDF, forzamos la detección si parece uno
+            # Forzar tipo PDF si la URL o el tipo original lo sugieren
             if 'pdf' not in content_type and ('.pdf' in url.lower() or 'image/upload' in url):
-                 # A veces Cloudinary devuelve octet-stream, forzamos PDF si es para el visor
                  content_type = 'application/pdf'
 
-            # Usamos StreamingHttpResponse para eficiencia
-            django_response = StreamingHttpResponse(
-                response.iter_content(chunk_size=8192), 
-                content_type=content_type
-            )
+            # Servimos el archivo usando HttpResponse estándar
+            # Esto permite que Django calcule el Content-Length automáticamente
+            django_response = HttpResponse(response.content, content_type=content_type)
             
-            # --- EL TRUCO CLAVE ---
-            # Forzamos filename="archivo.pdf" para que Chrome active el visor interno
-            django_response['Content-Disposition'] = 'inline; filename="visualizacion.pdf"'
+            # Forzamos nombre de archivo y disposición inline
+            django_response['Content-Disposition'] = 'inline; filename="documento_visualizacion.pdf"'
             
-            # Aseguramos que se permita en iframe
+            # Encabezados de seguridad permisivos para el iframe
             django_response['X-Frame-Options'] = 'SAMEORIGIN'
+            
+            # IMPORTANTE: Asegurar que se envía el tamaño
+            django_response['Content-Length'] = len(response.content)
             
             return django_response
         else:
@@ -84,6 +86,7 @@ def pdf_datos_personales(request):
     cursos_objs = CursosRealizados.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_cursos else []
     reco_objs = Reconocimientos.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_logros else []
     garage_items = VentaGarage.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_garage else []
+    
     academicos = ProductosAcademicos.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_proy else []
     laborales = ProductosLaborales.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_proy else []
 
