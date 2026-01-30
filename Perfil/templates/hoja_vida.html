@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM v5.0 | {{ perfil.nombres|default:"USUARIO" }}</title>
+    <title>SYSTEM v6.0 | {{ perfil.nombres|default:"USUARIO" }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -589,7 +589,7 @@
             <!-- Footer -->
             <footer class="text-center text-gray-600 text-xs font-mono mt-20 pt-10 border-t border-gray-900 mb-10">
                 <p class="mb-2 tracking-[0.5em] font-orbitron">END OF LINE</p>
-                <p class="font-rajdhani">&copy; {% now "Y" %} {{ perfil.nombres|default:"USUARIO" }} {{ perfil.apellidos|default:"DESCONOCIDO" }}. SISTEMA v5.0 SECURE.</p>
+                <p class="font-rajdhani">&copy; {% now "Y" %} {{ perfil.nombres|default:"USUARIO" }} {{ perfil.apellidos|default:"DESCONOCIDO" }}. SISTEMA v6.0 SECURE.</p>
             </footer>
         </main>
     </div>
@@ -611,10 +611,9 @@
         }
         
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("%c VERSIÓN V5 - PREVISUALIZACIÓN CORREGIDA ", "background: #00f3ff; color: #000000; font-size: 20px; font-weight: bold;");
+            console.log("%c VERSIÓN V6 - PREVISUALIZACIÓN CORREGIDA ", "background: #00f3ff; color: #000000; font-size: 20px; font-weight: bold;");
             if(localStorage.getItem('cv-theme') === 'ares') toggleTheme(); 
             
-            // Asignar evento al modal con comprobación de seguridad
             const modal = document.getElementById('preview-modal');
             if (modal) {
                 modal.addEventListener('click', function(e) { 
@@ -622,7 +621,6 @@
                 });
             }
             
-            // Asignar evento al botón de cierre si existe
             const closeBtn = document.querySelector('#preview-modal button');
             if(closeBtn) {
                closeBtn.addEventListener('click', closePreview);
@@ -639,64 +637,82 @@
             const loader = document.getElementById('preview-loader');
             const downloadLink = document.getElementById('download-link');
             
-            if (!modal) {
-                console.error("Error: Modal no encontrado en el DOM");
-                return;
-            }
+            if (!modal) return;
 
             // Resetear estado visual
             modal.classList.remove('hidden');
             if(loader) loader.classList.remove('hidden');
             if(frame) frame.classList.add('hidden');
             if(imgContainer) imgContainer.classList.add('hidden');
-            
             if(frame) frame.src = '';
             if(img) img.src = '';
-
             if(downloadLink) downloadLink.href = url;
 
-            // Detectar si es imagen
-            const isImage = url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) || url.includes('image/upload');
+            // --- LÓGICA CORREGIDA PARA DETECTAR TIPO DE ARCHIVO ---
             
-            if (isImage) {
-                console.log("Modo IMAGEN detectado");
+            // 1. Chequeo explícito de PDF
+            const isPDF = url.toLowerCase().includes('.pdf');
+            
+            // 2. Chequeo de Imagen (solo si tiene extensión explícita de imagen)
+            const hasImageExtension = url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i);
+            
+            // 3. Cloudinary a veces no tiene extensión, pero si tiene "image/upload" y NO es PDF, asumimos imagen primero.
+            // PERO si falla, haremos fallback.
+            const looksLikeImage = hasImageExtension || (url.includes('image/upload') && !isPDF);
+
+            if (looksLikeImage) {
+                console.log("Parece una IMAGEN, intentando cargar...");
                 if(img) {
                     img.src = url;
+                    
                     img.onload = () => { 
                         console.log("Imagen cargada correctamente");
                         if(loader) loader.classList.add('hidden'); 
                         if(imgContainer) imgContainer.classList.remove('hidden'); 
                     };
+                    
+                    // --- FALLBACK CRÍTICO ---
                     img.onerror = () => { 
-                        console.warn("Error cargando imagen directa, intentando proxy...");
-                        img.src = `/ver-archivo/?url=${encodeURIComponent(url)}`;
+                        console.warn("Fallo al cargar como imagen. Es probable que sea un PDF camuflado. Cambiando a modo Documento...");
+                        // Limpiamos src de imagen para detener peticiones
+                        img.src = '';
+                        img.removeAttribute('src');
+                        
+                        // Cambiamos a modo IFRAME
+                        loadAsDocument(url, frame, loader);
                     };
                 }
             } else {
-                // MODO PDF / DOC
-                console.log("Modo PDF/DOC detectado - Usando Proxy");
+                // Asumimos que es documento/PDF directamente
+                loadAsDocument(url, frame, loader);
+            }
+        }
+
+        // Función auxiliar para cargar en iframe con proxy
+        function loadAsDocument(url, frame, loader) {
+            console.log("Cargando como Documento (PDF/Proxy)...");
+            
+            const imgContainer = document.getElementById('image-container');
+            if(imgContainer) imgContainer.classList.add('hidden'); // Asegurar que el contenedor de imagen esté oculto
+            
+            const timestamp = new Date().getTime();
+            const proxyUrl = `/ver-archivo/?url=${encodeURIComponent(url)}&t=${timestamp}`;
+            
+            if(frame) {
+                frame.src = proxyUrl;
                 
-                const timestamp = new Date().getTime();
-                const proxyUrl = `/ver-archivo/?url=${encodeURIComponent(url)}&t=${timestamp}`;
+                // Lógica de seguridad para Chrome/Render
+                setTimeout(() => {
+                    console.log("Forzando visualización del iframe (Timeout)");
+                    if(loader) loader.classList.add('hidden');
+                    frame.classList.remove('hidden');
+                }, 1500); 
                 
-                console.log("URL del Proxy generada:", proxyUrl);
-                
-                if(frame) {
-                    frame.src = proxyUrl;
-                    
-                    // Lógica para Chrome/Render
-                    setTimeout(() => {
-                        console.log("Timeout de seguridad ejecutado: Forzando visualización del iframe");
-                        if(loader) loader.classList.add('hidden');
-                        frame.classList.remove('hidden');
-                    }, 1500); 
-                    
-                    frame.onload = () => {
-                        console.log("Evento onload disparado (éxito)");
-                        if(loader) loader.classList.add('hidden');
-                        frame.classList.remove('hidden');
-                    };
-                }
+                frame.onload = () => {
+                    console.log("Documento cargado en iframe (onload)");
+                    if(loader) loader.classList.add('hidden');
+                    frame.classList.remove('hidden');
+                };
             }
         }
 
@@ -707,7 +723,10 @@
             
             if(modal) modal.classList.add('hidden');
             if(frame) frame.src = '';
-            if(img) img.src = '';
+            if(img) {
+                img.src = '';
+                img.removeAttribute('src'); // Importante para detener descargas en segundo plano
+            }
         }
         
         document.addEventListener('keydown', function(event) { if (event.key === "Escape") closePreview(); });
