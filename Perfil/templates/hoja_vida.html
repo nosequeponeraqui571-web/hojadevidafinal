@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM v6.0 | {{ perfil.nombres|default:"USUARIO" }}</title>
+    <title>SYSTEM v7.0 | {{ perfil.nombres|default:"USUARIO" }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -122,7 +122,6 @@
     <!-- MODAL PREVISUALIZADOR ADAPTATIVO -->
     <div id="preview-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 md:p-8">
         <div id="modal-content" class="relative bg-black border border-tron-primary shadow-neon flex flex-col clip-tron transition-all duration-500 ease-in-out overflow-hidden w-full max-w-5xl h-[85vh]">
-            <!-- Header -->
             <div class="flex justify-between items-center p-4 border-b border-tron-primary/30 bg-tron-primary/10 shrink-0">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-eye text-tron-primary animate-pulse-glow"></i>
@@ -132,27 +131,18 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-
-            <!-- Contenedor de Contenido -->
             <div class="flex-1 p-0 bg-black/80 relative flex items-center justify-center overflow-hidden w-full h-full">
-                <!-- Loader -->
                 <div id="preview-loader" class="absolute inset-0 flex items-center justify-center z-10 bg-black/50 backdrop-blur-sm">
                     <div class="flex flex-col items-center">
                         <div class="w-16 h-16 border-4 border-tron-primary border-t-transparent rounded-full animate-spin mb-4"></div>
                         <p class="text-tron-primary font-orbitron text-xs tracking-widest animate-pulse">CARGANDO RECURSO...</p>
                     </div>
                 </div>
-                
-                <!-- Visor PDF (Iframe Nativo) -->
                 <iframe id="preview-frame" class="hidden w-full h-full border-none relative z-20 bg-white"></iframe>
-                
-                <!-- Visor Imagen -->
                 <div id="image-container" class="hidden w-full h-full relative z-20 flex items-center justify-center overflow-auto p-2 bg-black/90">
                     <img id="preview-image" src="" class="max-w-full max-h-full object-contain shadow-2xl border border-tron-primary/20">
                 </div>
             </div>
-
-            <!-- Footer -->
             <div class="p-2 border-t border-tron-primary/30 bg-black flex justify-end shrink-0 gap-2">
                  <a id="download-link" href="#" target="_blank" class="text-xs font-mono text-white flex items-center gap-2 px-4 py-2 bg-tron-primary/20 hover:bg-tron-primary hover:text-black transition border border-tron-primary clip-tron">
                     <i class="fas fa-external-link-alt"></i> ABRIR ORIGINAL
@@ -162,7 +152,6 @@
     </div>
 
     <div class="flex flex-col md:flex-row min-h-screen">
-        <!-- SIDEBAR -->
         <aside class="sidebar-container bg-black/90 backdrop-blur-xl flex flex-col md:fixed md:h-screen z-50 overflow-x-hidden no-scrollbar group shadow-none transition-shadow duration-500 hover:shadow-neon">
             <div class="h-14 flex items-center justify-center border-b border-tron-primary/20 bg-gradient-to-r from-tron-primary/10 to-transparent overflow-hidden relative">
                 <button onclick="toggleTheme()" class="w-full h-full flex items-center justify-center group/btn focus:outline-none">
@@ -391,6 +380,7 @@
                 </div>
             </section>
 
+            <!-- 2. EXPERIENCIA LABORAL -->
             {% if experiencias %}
             <section id="experiencia-laboral" class="mb-32">
                 <div class="flex items-center gap-4 mb-10">
@@ -428,6 +418,7 @@
             </section>
             {% endif %}
 
+            <!-- 3. CURSOS REALIZADOS -->
             {% if cursos %}
             <section id="cursos-realizados" class="mb-32">
                 <div class="flex items-center gap-4 mb-10">
@@ -460,6 +451,7 @@
             </section>
             {% endif %}
 
+            <!-- 4. RECONOCIMIENTOS -->
             {% if reconocimientos %}
             <section id="reconocimientos" class="mb-32">
                 <div class="flex items-center gap-4 mb-10">
@@ -487,6 +479,7 @@
             </section>
             {% endif %}
 
+            <!-- 5. PRODUCTOS ACADÉMICOS - MODIFICADO "FULL BLEED" -->
             {% if productos_academicos %}
             <section id="productos-academicos" class="mb-32">
                 <div class="flex items-center gap-4 mb-10">
@@ -495,35 +488,46 @@
                 </div>
                 <div class="grid md:grid-cols-2 gap-8">
                     {% for prod in productos_academicos %}
-                    <div class="p-6 bg-tron-panel border border-white/20 hover:border-white transition-all duration-300 shadow-neon-white clip-tron h-full flex flex-col group">
+                    <div class="bg-tron-panel border border-white/20 hover:border-white transition-all duration-300 shadow-neon-white clip-tron h-full flex flex-col group p-0">
+                        <!-- IMAGEN FULL BLEED -->
                         {% if prod.imagen_producto %}
-                        <div class="w-full h-56 mb-4 overflow-hidden border border-white/10 relative clip-tron bg-black/50">
+                        <div class="w-full h-64 overflow-hidden border-b border-white/10 relative bg-black/50">
+                            <!-- Overlay al hacer hover -->
                             <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer" onclick="openPreview('{{ prod.imagen_producto.url }}')">
                                 <span class="text-white font-orbitron tracking-widest border border-white px-4 py-2 hover:bg-white hover:text-black transition">
                                     <i class="fas fa-expand me-2"></i> AMPLIAR
                                 </span>
                             </div>
+                            <!-- Imagen ajustada -->
                             <img src="{{ prod.imagen_producto.url }}" alt="{{ prod.nombrerecurso }}" class="w-full h-full object-cover object-top opacity-90 group-hover:scale-110 transition-transform duration-700">
                         </div>
                         {% endif %}
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-white text-xl font-orbitron">{{ prod.nombrerecurso|default:"" }}</h4>
-                            <i class="fas fa-scroll text-white text-xl"></i>
+                        
+                        <!-- CONTENIDO CON PADDING -->
+                        <div class="p-6 flex flex-col flex-grow">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="font-bold text-white text-xl font-orbitron">{{ prod.nombrerecurso|default:"" }}</h4>
+                                <i class="fas fa-scroll text-white text-xl"></i>
+                            </div>
+                            <span class="inline-block bg-white/10 text-white text-[10px] px-2 py-1 mt-1 mb-4 uppercase font-orbitron self-start">{{ prod.clasificador|default:"" }}</span>
+                            <p class="text-gray-200 text-sm border-t border-white/10 pt-4 font-rajdhani flex-grow">{{ prod.descripcion|default:"" }}</p>
+                            
+                            <!-- BOTÓN VISUALIZAR -->
+                            {% if prod.imagen_producto %}
+                            <div class="mt-6">
+                                <button onclick="openPreview('{{ prod.imagen_producto.url }}')" class="w-full block text-center py-3 bg-white/5 border border-white text-white text-sm hover:bg-white hover:text-black transition uppercase font-bold tracking-widest clip-tron font-orbitron">
+                                    <i class="fas fa-eye mr-2"></i> Visualizar Recurso
+                                </button>
+                            </div>
+                            {% endif %}
                         </div>
-                        <p class="text-gray-200 text-sm border-t border-white/10 pt-4 font-rajdhani flex-grow">{{ prod.descripcion|default:"" }}</p>
-                        {% if prod.imagen_producto %}
-                        <div class="mt-6">
-                            <button onclick="openPreview('{{ prod.imagen_producto.url }}')" class="w-full block text-center py-3 bg-white/5 border border-white text-white text-sm hover:bg-white hover:text-black transition uppercase font-bold tracking-widest clip-tron font-orbitron">
-                                <i class="fas fa-eye mr-2"></i> Visualizar Recurso
-                            </button>
-                        </div>
-                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>
             </section>
             {% endif %}
 
+            <!-- 6. PRODUCTOS LABORALES -->
             {% if productos_laborales %}
             <section id="productos-laborales" class="mb-32">
                 <div class="flex items-center gap-4 mb-10">
@@ -537,6 +541,7 @@
                             <h4 class="font-bold text-white text-xl font-orbitron">{{ prod.nombreproducto|default:"" }}</h4>
                             <i class="fas fa-cogs text-tron-primary text-xl"></i>
                         </div>
+                        <span class="inline-block text-tron-primary text-[10px] border border-tron-primary/50 px-2 py-1 mt-1 mb-4 font-mono self-start">{{ prod.fechaproducto|date:"Y.m.d" }}</span>
                         <p class="text-gray-200 text-sm border-t border-tron-primary/20 pt-4 font-rajdhani flex-grow">{{ prod.descripcion|default:"" }}</p>
                         {% if prod.url_proyecto %}
                         <div class="mt-4 text-right">
@@ -549,6 +554,7 @@
             </section>
             {% endif %}
 
+            <!-- 7. VENTA GARAGE -->
             {% if venta_garage %}
             <section id="venta-garage" class="mb-20 pt-10 border-t-4 border-double border-gray-800">
                 <div class="flex justify-between items-center mb-10">
@@ -566,12 +572,18 @@
                             {% else %}
                                 <i class="fas fa-cube text-6xl text-gray-700 group-hover:text-tron-primary transition duration-500"></i>
                             {% endif %}
+                            <div class="absolute top-0 right-0 bg-white text-black px-3 py-1 text-xs font-bold uppercase font-orbitron">
+                                {{ item.estadoproducto|default:"Stock" }}
+                            </div>
                         </div>
                         <div class="p-6 relative z-10 flex-grow flex flex-col">
                             <h3 class="font-bold text-2xl text-white mb-2 truncate font-orbitron">{{ item.nombreproducto|default:"Item" }}</h3>
+                            <p class="text-sm text-gray-300 line-clamp-2 mb-6 h-10 font-rajdhani flex-grow">{{ item.descripcion|default:"..." }}</p>
                             <div class="flex justify-between items-center pt-4 border-t border-gray-800 mt-auto">
                                 <span class="text-3xl font-black text-tron-primary font-mono">${{ item.valordelbien|floatformat:0 }}</span>
-                                <button onclick="navigator.clipboard.writeText('{{ item.idperfilconqueestaactivo.email_contacto }}').then(() => alert('Email copiado'))" class="text-black bg-white px-4 py-2 text-xs font-bold uppercase hover:bg-tron-primary transition clip-tron font-orbitron">CONTACTAR</button>
+                                <button onclick="navigator.clipboard.writeText('{{ item.idperfilconqueestaactivo.email_contacto }}').then(() => alert('Email de contacto copiado al portapapeles'))" class="text-black bg-white px-4 py-2 text-xs font-bold uppercase hover:bg-tron-primary transition clip-tron font-orbitron">
+                                    CONTACTAR
+                                </button>
                             </div>
                             {% if item.documento_interes %}
                             <div class="mt-2 text-center">
@@ -585,20 +597,23 @@
             </section>
             {% endif %}
 
-
             <!-- Footer -->
             <footer class="text-center text-gray-600 text-xs font-mono mt-20 pt-10 border-t border-gray-900 mb-10">
                 <p class="mb-2 tracking-[0.5em] font-orbitron">END OF LINE</p>
-                <p class="font-rajdhani">&copy; {% now "Y" %} {{ perfil.nombres|default:"USUARIO" }} {{ perfil.apellidos|default:"DESCONOCIDO" }}. SISTEMA v6.0 SECURE.</p>
+                <p class="font-rajdhani">&copy; {% now "Y" %} {{ perfil.nombres|default:"USUARIO" }} {{ perfil.apellidos|default:"DESCONOCIDO" }}. SISTEMA v7.0 SECURE.</p>
             </footer>
+
         </main>
     </div>
 
+    <!-- Script del Previsualizador y Toggle de Tema -->
     <script>
         function toggleTheme() {
             const body = document.getElementById('main-body');
             const icon = document.getElementById('theme-icon');
+            
             body.classList.toggle('theme-ares');
+            
             if(body.classList.contains('theme-ares')) {
                 localStorage.setItem('cv-theme', 'ares');
                 icon.style.transform = 'rotate(180deg)';
@@ -611,7 +626,7 @@
         }
         
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("%c VERSIÓN V6 - PREVISUALIZACIÓN CORREGIDA ", "background: #00f3ff; color: #000000; font-size: 20px; font-weight: bold;");
+            console.log("%c VERSIÓN V7 - ESTILO DE TARJETAS CORREGIDO ", "background: #00f3ff; color: #000000; font-size: 20px; font-weight: bold;");
             if(localStorage.getItem('cv-theme') === 'ares') toggleTheme(); 
             
             const modal = document.getElementById('preview-modal');
@@ -648,16 +663,9 @@
             if(img) img.src = '';
             if(downloadLink) downloadLink.href = url;
 
-            // --- LÓGICA CORREGIDA PARA DETECTAR TIPO DE ARCHIVO ---
-            
-            // 1. Chequeo explícito de PDF
+            // --- LÓGICA DE DETECCIÓN ---
             const isPDF = url.toLowerCase().includes('.pdf');
-            
-            // 2. Chequeo de Imagen (solo si tiene extensión explícita de imagen)
             const hasImageExtension = url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i);
-            
-            // 3. Cloudinary a veces no tiene extensión, pero si tiene "image/upload" y NO es PDF, asumimos imagen primero.
-            // PERO si falla, haremos fallback.
             const looksLikeImage = hasImageExtension || (url.includes('image/upload') && !isPDF);
 
             if (looksLikeImage) {
@@ -671,29 +679,23 @@
                         if(imgContainer) imgContainer.classList.remove('hidden'); 
                     };
                     
-                    // --- FALLBACK CRÍTICO ---
                     img.onerror = () => { 
-                        console.warn("Fallo al cargar como imagen. Es probable que sea un PDF camuflado. Cambiando a modo Documento...");
-                        // Limpiamos src de imagen para detener peticiones
+                        console.warn("Fallo al cargar como imagen. Cambiando a modo Documento...");
                         img.src = '';
                         img.removeAttribute('src');
-                        
-                        // Cambiamos a modo IFRAME
                         loadAsDocument(url, frame, loader);
                     };
                 }
             } else {
-                // Asumimos que es documento/PDF directamente
                 loadAsDocument(url, frame, loader);
             }
         }
 
-        // Función auxiliar para cargar en iframe con proxy
         function loadAsDocument(url, frame, loader) {
             console.log("Cargando como Documento (PDF/Proxy)...");
             
             const imgContainer = document.getElementById('image-container');
-            if(imgContainer) imgContainer.classList.add('hidden'); // Asegurar que el contenedor de imagen esté oculto
+            if(imgContainer) imgContainer.classList.add('hidden'); 
             
             const timestamp = new Date().getTime();
             const proxyUrl = `/ver-archivo/?url=${encodeURIComponent(url)}&t=${timestamp}`;
@@ -701,7 +703,6 @@
             if(frame) {
                 frame.src = proxyUrl;
                 
-                // Lógica de seguridad para Chrome/Render
                 setTimeout(() => {
                     console.log("Forzando visualización del iframe (Timeout)");
                     if(loader) loader.classList.add('hidden');
@@ -725,7 +726,7 @@
             if(frame) frame.src = '';
             if(img) {
                 img.src = '';
-                img.removeAttribute('src'); // Importante para detener descargas en segundo plano
+                img.removeAttribute('src'); 
             }
         }
         
