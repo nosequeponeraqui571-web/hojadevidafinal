@@ -1,8 +1,9 @@
 import io
 import requests
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, StreamingHttpResponse
+from django.http import HttpResponse
 from django.template.loader import get_template
+from django.views.decorators.clickjacking import xframe_options_exempt # <--- IMPORTANTE
 from xhtml2pdf import pisa
 from pypdf import PdfWriter, PdfReader 
 
@@ -31,39 +32,34 @@ def home(request):
     }
     return render(request, 'hoja_vida.html', context)
 
-# --- NUEVA VISTA PARA EL TÚNEL DE ARCHIVOS ---
+# --- VISTA TÚNEL MEJORADA ---
+@xframe_options_exempt # <--- ESTO PERMITE QUE SE VEA EN EL IFRAME SIN BLOQUEOS
 def ver_archivo(request):
-    """
-    Esta vista actúa como un proxy. Descarga el archivo de Cloudinary (o donde sea)
-    y lo sirve desde el propio dominio de la aplicación para evitar bloqueos CORS/Iframe.
-    """
     url = request.GET.get('url')
     if not url:
         return HttpResponse("No se proporcionó URL", status=400)
     
     try:
-        # Hacemos la petición al servidor externo (Cloudinary)
-        response = requests.get(url, stream=True, timeout=10)
+        # Stream=True es vital para no cargar archivos gigantes en memoria RAM
+        response = requests.get(url, stream=True, timeout=15)
         
         if response.status_code == 200:
-            # Obtenemos el tipo de contenido original (application/pdf, image/png, etc.)
             content_type = response.headers.get('Content-Type', 'application/pdf')
             
-            # Servimos el contenido directamente
-            # Usamos HttpResponse con el contenido en bytes
-            django_response = HttpResponse(response.content, content_type=content_type)
+            # StreamingHttpResponse es mejor para archivos en Render
+            from django.http import StreamingHttpResponse
+            django_response = StreamingHttpResponse(
+                response.iter_content(chunk_size=8192), 
+                content_type=content_type
+            )
             
-            # Forzamos que se muestre en línea (no descargar)
             django_response['Content-Disposition'] = 'inline'
-            # Eliminamos restricciones de frame para esta respuesta específica si existieran
-            django_response['X-Frame-Options'] = 'SAMEORIGIN'
-            
             return django_response
         else:
-            return HttpResponse(f"Error al obtener el archivo remoto: {response.status_code}", status=404)
+            return HttpResponse(f"Error remoto: {response.status_code}", status=404)
             
     except Exception as e:
-        return HttpResponse(f"Error interno del servidor: {str(e)}", status=500)
+        return HttpResponse(f"Error servidor: {str(e)}", status=500)
 
 def pdf_datos_personales(request):
     perfil = get_object_or_404(DatosPersonales, perfilactivo=1)
@@ -77,13 +73,14 @@ def pdf_datos_personales(request):
     cursos_objs = CursosRealizados.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_cursos else []
     reco_objs = Reconocimientos.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_logros else []
     garage_items = VentaGarage.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_garage else []
+    
     academicos = ProductosAcademicos.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_proy else []
     laborales = ProductosLaborales.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_proy else []
 
     try:
         template = get_template('cv_pdf_maestro.html')
     except:
-        return HttpResponse("Error: Falta el template 'cv_pdf_maestro.html'", status=500)
+        return HttpResponse("Error: Falta template", status=500)
 
     html = template.render({
         'perfil': perfil, 'items': experiencias, 'productos': academicos,
@@ -111,9 +108,7 @@ def pdf_datos_personales(request):
                     r = requests.get(archivo.url, timeout=15)
                     if r.status_code == 200:
                         writer.append(io.BytesIO(r.content))
-                except Exception as e:
-                    print(f"Error pegando certificado: {e}")
-                    continue
+                except: continue
 
     if incl_exp: pegar_certificados(experiencias, 'rutacertificado')
     if incl_cursos: pegar_certificados(cursos_objs, 'rutacertificado')
