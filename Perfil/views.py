@@ -32,47 +32,37 @@ def home(request):
     }
     return render(request, 'hoja_vida.html', context)
 
-# --- VISTA TÚNEL VERSIÓN ROBUSTA ---
+# --- VISTA PROXY PARA PDFS ---
 @xframe_options_exempt
 def ver_archivo(request):
-    """
-    Descarga el archivo completo en memoria y lo sirve con Content-Length.
-    Esto es más compatible con visores PDF de navegadores que el Streaming.
-    """
     url = request.GET.get('url')
     if not url:
-        return HttpResponse("No se proporcionó URL", status=400)
+        return HttpResponse("Falta el parámetro URL", status=400)
     
     try:
-        # Petición estándar (sin stream=True) para obtener todo el contenido
-        response = requests.get(url, timeout=20)
+        # Timeout más largo para archivos grandes
+        response = requests.get(url, timeout=25)
         
         if response.status_code == 200:
+            # Forzar Content-Type a PDF si parece ser uno, para corregir headers de Cloudinary
             content_type = response.headers.get('Content-Type', '')
-            
-            # Forzar tipo PDF si la URL o el tipo original lo sugieren
-            if 'pdf' not in content_type and ('.pdf' in url.lower() or 'image/upload' in url):
-                 content_type = 'application/pdf'
+            if 'pdf' not in content_type.lower() or 'application/octet-stream' in content_type:
+                content_type = 'application/pdf'
 
-            # Servimos el archivo usando HttpResponse estándar
-            # Esto permite que Django calcule el Content-Length automáticamente
+            # Servir el contenido
             django_response = HttpResponse(response.content, content_type=content_type)
             
-            # Forzamos nombre de archivo y disposición inline
+            # Encabezados vitales para que Chrome muestre el PDF y no lo descargue
             django_response['Content-Disposition'] = 'inline; filename="documento_visualizacion.pdf"'
-            
-            # Encabezados de seguridad permisivos para el iframe
             django_response['X-Frame-Options'] = 'SAMEORIGIN'
-            
-            # IMPORTANTE: Asegurar que se envía el tamaño
             django_response['Content-Length'] = len(response.content)
             
             return django_response
         else:
-            return HttpResponse(f"Error remoto: {response.status_code}", status=404)
+            return HttpResponse(f"Error al obtener archivo remoto: {response.status_code}", status=404)
             
     except Exception as e:
-        return HttpResponse(f"Error servidor: {str(e)}", status=500)
+        return HttpResponse(f"Error del servidor: {str(e)}", status=500)
 
 def pdf_datos_personales(request):
     perfil = get_object_or_404(DatosPersonales, perfilactivo=1)
@@ -86,7 +76,6 @@ def pdf_datos_personales(request):
     cursos_objs = CursosRealizados.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_cursos else []
     reco_objs = Reconocimientos.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_logros else []
     garage_items = VentaGarage.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_garage else []
-    
     academicos = ProductosAcademicos.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_proy else []
     laborales = ProductosLaborales.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_proy else []
 

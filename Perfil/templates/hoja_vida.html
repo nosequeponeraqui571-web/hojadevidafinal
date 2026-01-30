@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM | {{ perfil.nombres|default:"USUARIO" }}</title>
+    <title>SYSTEM v5.0 | {{ perfil.nombres|default:"USUARIO" }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -391,8 +391,7 @@
                 </div>
             </section>
 
-            <!-- (Rest of sections identical, omitting for brevity to focus on JS logic below) -->
-             {% if experiencias %}
+            {% if experiencias %}
             <section id="experiencia-laboral" class="mb-32">
                 <div class="flex items-center gap-4 mb-10">
                     <span class="text-white text-4xl shadow-neon-white rounded-full p-2"><i class="fas fa-briefcase"></i></span>
@@ -590,7 +589,7 @@
             <!-- Footer -->
             <footer class="text-center text-gray-600 text-xs font-mono mt-20 pt-10 border-t border-gray-900 mb-10">
                 <p class="mb-2 tracking-[0.5em] font-orbitron">END OF LINE</p>
-                <p class="font-rajdhani">&copy; {% now "Y" %} {{ perfil.nombres|default:"USUARIO" }} {{ perfil.apellidos|default:"DESCONOCIDO" }}. SISTEMA SECURE.</p>
+                <p class="font-rajdhani">&copy; {% now "Y" %} {{ perfil.nombres|default:"USUARIO" }} {{ perfil.apellidos|default:"DESCONOCIDO" }}. SISTEMA v5.0 SECURE.</p>
             </footer>
         </main>
     </div>
@@ -612,7 +611,7 @@
         }
         
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("%c VERSIÓN V4 - PREVISUALIZACIÓN CORREGIDA ", "background: #00f3ff; color: #000000; font-size: 20px; font-weight: bold;");
+            console.log("%c VERSIÓN V5 - PREVISUALIZACIÓN CORREGIDA ", "background: #00f3ff; color: #000000; font-size: 20px; font-weight: bold;");
             if(localStorage.getItem('cv-theme') === 'ares') toggleTheme(); 
             
             // Asignar evento al modal con comprobación de seguridad
