@@ -15,8 +15,7 @@ RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-# --- FIX 1: CSRF PARA ADMIN EN PRODUCCIÓN ---
-# Necesario para poder loguearse en el admin via HTTPS
+# --- FIX CSRF ---
 CSRF_TRUSTED_ORIGINS = [
     'https://hoja-de-vida-rafael.onrender.com', 
 ]
@@ -30,7 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'whitenoise.runserver_nostatic', 
+    'whitenoise.runserver_nostatic', # Importante que esté antes de staticfiles
     'django.contrib.staticfiles',
     'cloudinary_storage',
     'cloudinary',
@@ -40,7 +39,7 @@ INSTALLED_APPS = [
 # Middlewares
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Vital para servir estáticos en Render
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -77,14 +76,18 @@ DATABASES = {
     )
 }
 
-# CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS
+# --- CONFIGURACIÓN ESTÁTICOS CORREGIDA (WHITENOISE) ---
 STATIC_URL = 'static/'
+
+# En producción, collectstatic reunirá todo aquí
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Carpetas extra donde buscar estáticos (si tienes una carpeta 'static' en la raíz)
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    os.path.join(BASE_DIR, 'static'),
 ]
 
-# --- CONFIGURACIÓN DE CLOUDINARY ---
+# --- CLOUDINARY MEDIA ---
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
@@ -92,26 +95,25 @@ CLOUDINARY_STORAGE = {
     'SECURE': True,
 }
 
-if CLOUDINARY_STORAGE['CLOUD_NAME'] and CLOUDINARY_STORAGE['API_KEY'] and CLOUDINARY_STORAGE['API_SECRET']:
+if CLOUDINARY_STORAGE['CLOUD_NAME']:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     MEDIA_URL = '/media/'
 else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
 
-# --- FIX 2: ALMACENAMIENTO ESTÁTICO SEGURO ---
-# Cambiado de CompressedManifestStaticFilesStorage a CompressedStaticFilesStorage
-# La versión "Manifest" causa error 500 si falta un archivo referenciado. Esta es más segura.
+# --- STORAGES (Django 4.2+) ---
 STORAGES = {
     "default": {
         "BACKEND": DEFAULT_FILE_STORAGE if 'DEFAULT_FILE_STORAGE' in locals() else "django.core.files.storage.FileSystemStorage",
     },
+    # USAR ESTE BACKEND ES LA CLAVE PARA QUE EL ADMIN SE VEA BIEN
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
-# --- CONFIGURACIÓN DE SEGURIDAD PARA RENDER (HTTPS) ---
+# --- SEGURIDAD ---
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
@@ -128,8 +130,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
-# --- FIX 3: LOGGING PARA DEBUG EN PRODUCCIÓN ---
-# Esto hará que los errores aparezcan en los logs de Render
+# Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
