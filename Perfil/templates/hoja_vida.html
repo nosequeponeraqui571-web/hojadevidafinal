@@ -744,31 +744,44 @@
             modal.classList.remove('hidden');
             loader.classList.remove('hidden');
             
-            // Detectar extensión (muy básico, puedes mejorarlo con regex o verificando mimetype si lo tienes)
+            // Forzar HTTPS si viene en HTTP (Fix para Render)
+            if (url.startsWith('http://')) {
+                url = url.replace('http://', 'https://');
+            }
+
+            // Detectar extensión (o si es imagen de cloudinary)
             const isImage = url.match(/\.(jpeg|jpg|gif|png|webp)$/i) || url.includes('image/upload');
             
             if (isImage) {
-                // Configuración para FOTOS (Adaptable)
+                // Configuración para FOTOS
                 frame.classList.add('hidden');
                 imgContainer.classList.remove('hidden');
                 img.src = url;
                 
-                // Clases de tamaño adaptable
                 content.classList.remove('w-full', 'max-w-5xl', 'h-[85vh]');
                 content.classList.add('w-auto', 'max-w-[90vw]', 'max-h-[90vh]');
                 
                 img.onload = () => loader.classList.add('hidden');
+                
+                // Safety timeout por si falla la carga
+                setTimeout(() => loader.classList.add('hidden'), 3000);
             } else {
-                // Configuración para PDF (Estándar)
+                // Configuración para PDF / Docs
                 imgContainer.classList.add('hidden');
                 frame.classList.remove('hidden');
-                frame.src = url;
                 
-                // Clases de tamaño fijo para lectura
+                // FIX CRÍTICO: Usar Google Docs Viewer para PDFs en iframes
+                // Esto evita bloqueos de seguridad y descargas forzadas
+                const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
+                frame.src = viewerUrl;
+                
                 content.classList.add('w-full', 'max-w-5xl', 'h-[85vh]');
                 content.classList.remove('w-auto', 'max-w-[90vw]', 'max-h-[90vh]');
                 
                 frame.onload = () => loader.classList.add('hidden');
+
+                // Safety timeout agresivo para PDFs (el evento onload en iframes externos a veces no dispara)
+                setTimeout(() => loader.classList.add('hidden'), 2000);
             }
             
             document.getElementById('download-link').href = url;
@@ -783,4 +796,4 @@
         document.getElementById('preview-modal').addEventListener('click', function(e) { if (e.target === this) closePreview(); });
     </script>
 </body>
-</html> 
+</html>
