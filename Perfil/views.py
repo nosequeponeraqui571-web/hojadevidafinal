@@ -1,9 +1,9 @@
 import io
 import requests
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.template.loader import get_template
-from django.views.decorators.clickjacking import xframe_options_exempt # <--- IMPORTANTE
+from django.views.decorators.clickjacking import xframe_options_exempt
 from xhtml2pdf import pisa
 from pypdf import PdfWriter, PdfReader 
 
@@ -32,28 +32,39 @@ def home(request):
     }
     return render(request, 'hoja_vida.html', context)
 
-# --- VISTA TÚNEL MEJORADA ---
-@xframe_options_exempt # <--- ESTO PERMITE QUE SE VEA EN EL IFRAME SIN BLOQUEOS
+# --- VISTA TÚNEL CORREGIDA ---
+@xframe_options_exempt
 def ver_archivo(request):
     url = request.GET.get('url')
     if not url:
         return HttpResponse("No se proporcionó URL", status=400)
     
     try:
-        # Stream=True es vital para no cargar archivos gigantes en memoria RAM
+        # Hacemos la petición a Cloudinary
         response = requests.get(url, stream=True, timeout=15)
         
         if response.status_code == 200:
-            content_type = response.headers.get('Content-Type', 'application/pdf')
+            # Determinamos el tipo de contenido
+            content_type = response.headers.get('Content-Type', '')
             
-            # StreamingHttpResponse es mejor para archivos en Render
-            from django.http import StreamingHttpResponse
+            # Si Cloudinary no nos dice que es PDF, forzamos la detección si parece uno
+            if 'pdf' not in content_type and ('.pdf' in url.lower() or 'image/upload' in url):
+                 # A veces Cloudinary devuelve octet-stream, forzamos PDF si es para el visor
+                 content_type = 'application/pdf'
+
+            # Usamos StreamingHttpResponse para eficiencia
             django_response = StreamingHttpResponse(
                 response.iter_content(chunk_size=8192), 
                 content_type=content_type
             )
             
-            django_response['Content-Disposition'] = 'inline'
+            # --- EL TRUCO CLAVE ---
+            # Forzamos filename="archivo.pdf" para que Chrome active el visor interno
+            django_response['Content-Disposition'] = 'inline; filename="visualizacion.pdf"'
+            
+            # Aseguramos que se permita en iframe
+            django_response['X-Frame-Options'] = 'SAMEORIGIN'
+            
             return django_response
         else:
             return HttpResponse(f"Error remoto: {response.status_code}", status=404)
@@ -73,14 +84,13 @@ def pdf_datos_personales(request):
     cursos_objs = CursosRealizados.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_cursos else []
     reco_objs = Reconocimientos.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_logros else []
     garage_items = VentaGarage.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_garage else []
-    
     academicos = ProductosAcademicos.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_proy else []
     laborales = ProductosLaborales.objects.filter(idperfilconqueestaactivo=perfil, activarparaqueseveaenfront=True) if incl_proy else []
 
     try:
         template = get_template('cv_pdf_maestro.html')
     except:
-        return HttpResponse("Error: Falta template", status=500)
+        return HttpResponse("Error: Falta template cv_pdf_maestro.html", status=500)
 
     html = template.render({
         'perfil': perfil, 'items': experiencias, 'productos': academicos,
