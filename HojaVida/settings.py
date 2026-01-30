@@ -15,7 +15,7 @@ RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-# Aplicaciones - El orden de cloudinary_storage es importante
+# Aplicaciones
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -81,10 +81,9 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
-    'SECURE_URL': True,  
+    'SECURE': True, # Forzar HTTPS en las URLs generadas
 }
 
-# Verificamos si las variables existen para activar el almacenamiento en la nube
 if CLOUDINARY_STORAGE['CLOUD_NAME'] and CLOUDINARY_STORAGE['API_KEY'] and CLOUDINARY_STORAGE['API_SECRET']:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     MEDIA_URL = '/media/'
@@ -92,7 +91,7 @@ else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
 
-# Configuración de Storages para Django 4.2+
+# Configuración de Storages
 STORAGES = {
     "default": {
         "BACKEND": DEFAULT_FILE_STORAGE if 'DEFAULT_FILE_STORAGE' in locals() else "django.core.files.storage.FileSystemStorage",
@@ -102,6 +101,14 @@ STORAGES = {
     },
 }
 
+# --- CONFIGURACIÓN DE SEGURIDAD PARA RENDER (HTTPS) ---
+# Esto es vital para evitar errores de contenido mixto
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
 # Idioma y Hora
 LANGUAGE_CODE = 'es-ec'
 TIME_ZONE = 'America/Guayaquil' 
@@ -110,5 +117,5 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Permite cargar PDFs en iframes
+# Permitir iframes (necesario para previsualizar PDFs)
 X_FRAME_OPTIONS = 'SAMEORIGIN'
