@@ -15,6 +15,14 @@ RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
+# --- FIX 1: CSRF PARA ADMIN EN PRODUCCIÓN ---
+# Necesario para poder loguearse en el admin via HTTPS
+CSRF_TRUSTED_ORIGINS = [
+    'https://hoja-de-vida-rafael.onrender.com', 
+]
+if RENDER_EXTERNAL_HOSTNAME:
+    CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
+
 # Aplicaciones
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -81,7 +89,7 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
-    'SECURE': True, # Forzar HTTPS en las URLs generadas
+    'SECURE': True,
 }
 
 if CLOUDINARY_STORAGE['CLOUD_NAME'] and CLOUDINARY_STORAGE['API_KEY'] and CLOUDINARY_STORAGE['API_SECRET']:
@@ -91,18 +99,19 @@ else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
 
-# Configuración de Storages
+# --- FIX 2: ALMACENAMIENTO ESTÁTICO SEGURO ---
+# Cambiado de CompressedManifestStaticFilesStorage a CompressedStaticFilesStorage
+# La versión "Manifest" causa error 500 si falta un archivo referenciado. Esta es más segura.
 STORAGES = {
     "default": {
         "BACKEND": DEFAULT_FILE_STORAGE if 'DEFAULT_FILE_STORAGE' in locals() else "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
 # --- CONFIGURACIÓN DE SEGURIDAD PARA RENDER (HTTPS) ---
-# Esto es vital para evitar errores de contenido mixto
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
@@ -117,5 +126,20 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Permitir iframes (necesario para previsualizar PDFs)
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# --- FIX 3: LOGGING PARA DEBUG EN PRODUCCIÓN ---
+# Esto hará que los errores aparezcan en los logs de Render
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
