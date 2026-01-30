@@ -610,12 +610,29 @@
                 icon.style.color = '#00f3ff';
             }
         }
+        
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("VERSION V3 ACTIVA - SI NO VES ESTO EN CONSOLA, BORRA CACHE");
+            console.log("%c VERSIÓN V4 - PREVISUALIZACIÓN CORREGIDA ", "background: #00f3ff; color: #000000; font-size: 20px; font-weight: bold;");
             if(localStorage.getItem('cv-theme') === 'ares') toggleTheme(); 
+            
+            // Asignar evento al modal con comprobación de seguridad
+            const modal = document.getElementById('preview-modal');
+            if (modal) {
+                modal.addEventListener('click', function(e) { 
+                    if (e.target === this) closePreview(); 
+                });
+            }
+            
+            // Asignar evento al botón de cierre si existe
+            const closeBtn = document.querySelector('#preview-modal button');
+            if(closeBtn) {
+               closeBtn.addEventListener('click', closePreview);
+            }
         });
 
         function openPreview(url) {
+            console.log("Intentando abrir previsualización para:", url);
+            
             const modal = document.getElementById('preview-modal');
             const frame = document.getElementById('preview-frame');
             const imgContainer = document.getElementById('image-container');
@@ -623,47 +640,78 @@
             const loader = document.getElementById('preview-loader');
             const downloadLink = document.getElementById('download-link');
             
+            if (!modal) {
+                console.error("Error: Modal no encontrado en el DOM");
+                return;
+            }
+
+            // Resetear estado visual
             modal.classList.remove('hidden');
-            loader.classList.remove('hidden');
-            frame.classList.add('hidden');
-            imgContainer.classList.add('hidden');
-            frame.src = '';
-            img.src = '';
+            if(loader) loader.classList.remove('hidden');
+            if(frame) frame.classList.add('hidden');
+            if(imgContainer) imgContainer.classList.add('hidden');
+            
+            if(frame) frame.src = '';
+            if(img) img.src = '';
 
-            downloadLink.href = url;
+            if(downloadLink) downloadLink.href = url;
 
+            // Detectar si es imagen
             const isImage = url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) || url.includes('image/upload');
             
             if (isImage) {
-                img.src = url;
-                img.onload = () => { loader.classList.add('hidden'); imgContainer.classList.remove('hidden'); };
-                img.onerror = () => { 
-                    img.src = `/ver-archivo/?url=${encodeURIComponent(url)}`;
-                };
+                console.log("Modo IMAGEN detectado");
+                if(img) {
+                    img.src = url;
+                    img.onload = () => { 
+                        console.log("Imagen cargada correctamente");
+                        if(loader) loader.classList.add('hidden'); 
+                        if(imgContainer) imgContainer.classList.remove('hidden'); 
+                    };
+                    img.onerror = () => { 
+                        console.warn("Error cargando imagen directa, intentando proxy...");
+                        img.src = `/ver-archivo/?url=${encodeURIComponent(url)}`;
+                    };
+                }
             } else {
-                // PDF HANDLING
+                // MODO PDF / DOC
+                console.log("Modo PDF/DOC detectado - Usando Proxy");
+                
                 const timestamp = new Date().getTime();
                 const proxyUrl = `/ver-archivo/?url=${encodeURIComponent(url)}&t=${timestamp}`;
-                console.log("Solicitando PDF:", proxyUrl);
                 
-                frame.src = proxyUrl;
+                console.log("URL del Proxy generada:", proxyUrl);
                 
-                // FORCE SHOW AFTER 2 SECONDS (Safety net for Chrome)
-                setTimeout(() => {
-                    console.log("Forzando visualización de iframe");
-                    loader.classList.add('hidden');
-                    frame.classList.remove('hidden');
-                }, 2000);
+                if(frame) {
+                    frame.src = proxyUrl;
+                    
+                    // Lógica para Chrome/Render
+                    setTimeout(() => {
+                        console.log("Timeout de seguridad ejecutado: Forzando visualización del iframe");
+                        if(loader) loader.classList.add('hidden');
+                        frame.classList.remove('hidden');
+                    }, 1500); 
+                    
+                    frame.onload = () => {
+                        console.log("Evento onload disparado (éxito)");
+                        if(loader) loader.classList.add('hidden');
+                        frame.classList.remove('hidden');
+                    };
+                }
             }
         }
 
         function closePreview() {
-            document.getElementById('preview-modal').classList.add('hidden');
-            document.getElementById('preview-frame').src = '';
-            document.getElementById('preview-image').src = '';
+            const modal = document.getElementById('preview-modal');
+            const frame = document.getElementById('preview-frame');
+            const img = document.getElementById('preview-image');
+            
+            if(modal) modal.classList.add('hidden');
+            if(frame) frame.src = '';
+            if(img) img.src = '';
         }
+        
         document.addEventListener('keydown', function(event) { if (event.key === "Escape") closePreview(); });
-        document.getElementById('preview-modal').addEventListener('click', function(e) { if (e.target === this) closePreview(); });
     </script>
 </body>
 </html>
