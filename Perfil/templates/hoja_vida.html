@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM v7.0 | {{ perfil.nombres|default:"USUARIO" }}</title>
+    <title>SYSTEM v8.0 | {{ perfil.nombres|default:"USUARIO" }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -113,15 +113,79 @@
         .ring-4 { width: 130%; height: 130%; border: 1px solid var(--primary-color); opacity: 0.3; animation: rotate-center 12s linear infinite; }
         @keyframes rotate-center { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
         @keyframes rotate-center-reverse { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(-360deg); } }
+        
+        /* ESTILOS CHECKBOX FUTURISTA */
+        .tron-checkbox {
+            appearance: none;
+            width: 20px; height: 20px;
+            border: 1px solid var(--primary-color);
+            background: rgba(0,0,0,0.5);
+            cursor: pointer;
+            position: relative;
+            margin-right: 10px;
+        }
+        .tron-checkbox:checked {
+            background: var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+        .tron-checkbox:checked::after {
+            content: '✔';
+            position: absolute; top: -2px; left: 3px;
+            color: black; font-size: 14px; font-weight: bold;
+        }
     </style>
 </head>
 <body id="main-body">
 
     <div class="the-grid"></div>
 
-    <!-- MODAL PREVISUALIZADOR ADAPTATIVO -->
+    <!-- MODAL DE SELECCIÓN DE PDF -->
+    <div id="pdf-selection-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-black/95 backdrop-blur-md p-4">
+        <div class="bg-black/90 border border-tron-primary shadow-neon w-full max-w-lg clip-tron relative p-8">
+            <h3 class="text-2xl text-tron-primary font-orbitron mb-6 text-center tracking-widest border-b border-tron-primary/30 pb-4">GENERAR REPORTE PDF</h3>
+            
+            <form id="pdf-form" onsubmit="generarPDF(event)">
+                <p class="text-white font-rajdhani mb-4 text-center">Seleccione las secciones a incluir en el documento:</p>
+                
+                <div class="space-y-4 mb-8">
+                    <label class="flex items-center cursor-pointer group hover:bg-tron-primary/10 p-2 border border-transparent hover:border-tron-primary/30 transition">
+                        <input type="checkbox" id="chk-experiencia" class="tron-checkbox" checked>
+                        <span class="text-white font-orbitron text-sm tracking-wider">EXPERIENCIA LABORAL</span>
+                    </label>
+                    
+                    <label class="flex items-center cursor-pointer group hover:bg-tron-primary/10 p-2 border border-transparent hover:border-tron-primary/30 transition">
+                        <input type="checkbox" id="chk-cursos" class="tron-checkbox" checked>
+                        <span class="text-white font-orbitron text-sm tracking-wider">CURSOS REALIZADOS</span>
+                    </label>
+                    
+                    <label class="flex items-center cursor-pointer group hover:bg-tron-primary/10 p-2 border border-transparent hover:border-tron-primary/30 transition">
+                        <input type="checkbox" id="chk-logros" class="tron-checkbox" checked>
+                        <span class="text-white font-orbitron text-sm tracking-wider">LOGROS / RECONOCIMIENTOS</span>
+                    </label>
+                    
+                    <label class="flex items-center cursor-pointer group hover:bg-tron-primary/10 p-2 border border-transparent hover:border-tron-primary/30 transition">
+                        <input type="checkbox" id="chk-proyectos" class="tron-checkbox" checked>
+                        <span class="text-white font-orbitron text-sm tracking-wider">PRODUCTOS ACADÉMICOS/LABORALES</span>
+                    </label>
+                    
+                    <label class="flex items-center cursor-pointer group hover:bg-tron-primary/10 p-2 border border-transparent hover:border-tron-primary/30 transition">
+                        <input type="checkbox" id="chk-garage" class="tron-checkbox">
+                        <span class="text-white font-orbitron text-sm tracking-wider text-gray-400">VENTA DE GARAJE</span>
+                    </label>
+                </div>
+
+                <div class="flex justify-between gap-4">
+                    <button type="button" onclick="closePdfModal()" class="flex-1 py-3 border border-gray-600 text-gray-400 hover:text-white hover:border-white font-orbitron tracking-widest text-xs transition">CANCELAR</button>
+                    <button type="submit" class="flex-1 py-3 bg-tron-primary text-black font-bold font-orbitron tracking-widest text-xs hover:bg-white transition shadow-neon">GENERAR PDF >></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PREVISUALIZADOR (Mantenido) -->
     <div id="preview-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 md:p-8">
         <div id="modal-content" class="relative bg-black border border-tron-primary shadow-neon flex flex-col clip-tron transition-all duration-500 ease-in-out overflow-hidden w-full max-w-5xl h-[85vh]">
+            <!-- Header -->
             <div class="flex justify-between items-center p-4 border-b border-tron-primary/30 bg-tron-primary/10 shrink-0">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-eye text-tron-primary animate-pulse-glow"></i>
@@ -131,18 +195,27 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
+
+            <!-- Contenedor de Contenido -->
             <div class="flex-1 p-0 bg-black/80 relative flex items-center justify-center overflow-hidden w-full h-full">
+                <!-- Loader -->
                 <div id="preview-loader" class="absolute inset-0 flex items-center justify-center z-10 bg-black/50 backdrop-blur-sm">
                     <div class="flex flex-col items-center">
                         <div class="w-16 h-16 border-4 border-tron-primary border-t-transparent rounded-full animate-spin mb-4"></div>
                         <p class="text-tron-primary font-orbitron text-xs tracking-widest animate-pulse">CARGANDO RECURSO...</p>
                     </div>
                 </div>
+                
+                <!-- Visor PDF (Iframe Nativo) -->
                 <iframe id="preview-frame" class="hidden w-full h-full border-none relative z-20 bg-white"></iframe>
+                
+                <!-- Visor Imagen -->
                 <div id="image-container" class="hidden w-full h-full relative z-20 flex items-center justify-center overflow-auto p-2 bg-black/90">
                     <img id="preview-image" src="" class="max-w-full max-h-full object-contain shadow-2xl border border-tron-primary/20">
                 </div>
             </div>
+
+            <!-- Footer -->
             <div class="p-2 border-t border-tron-primary/30 bg-black flex justify-end shrink-0 gap-2">
                  <a id="download-link" href="#" target="_blank" class="text-xs font-mono text-white flex items-center gap-2 px-4 py-2 bg-tron-primary/20 hover:bg-tron-primary hover:text-black transition border border-tron-primary clip-tron">
                     <i class="fas fa-external-link-alt"></i> ABRIR ORIGINAL
@@ -152,6 +225,7 @@
     </div>
 
     <div class="flex flex-col md:flex-row min-h-screen">
+        <!-- SIDEBAR -->
         <aside class="sidebar-container bg-black/90 backdrop-blur-xl flex flex-col md:fixed md:h-screen z-50 overflow-x-hidden no-scrollbar group shadow-none transition-shadow duration-500 hover:shadow-neon">
             <div class="h-14 flex items-center justify-center border-b border-tron-primary/20 bg-gradient-to-r from-tron-primary/10 to-transparent overflow-hidden relative">
                 <button onclick="toggleTheme()" class="w-full h-full flex items-center justify-center group/btn focus:outline-none">
@@ -167,12 +241,15 @@
                     </button>
                 </div>
                 {% endif %}
+                
+                <!-- BOTÓN MODIFICADO: ABRE EL MODAL -->
                 <div class="flex flex-col gap-1 mb-8 group/cv-gen">
-                    <a href="{% url 'exportar_cv' %}" target="_blank" class="flex items-center px-3 py-3 clip-tron bg-white/5 border-l-4 border-white text-white hover:bg-white hover:text-black transition-all duration-300 shadow-hud overflow-hidden whitespace-nowrap w-full text-left">
+                    <button onclick="openPdfModal()" class="flex items-center px-3 py-3 clip-tron bg-white/5 border-l-4 border-white text-white hover:bg-white hover:text-black transition-all duration-300 shadow-hud overflow-hidden whitespace-nowrap w-full text-left">
                         <i class="fas fa-print text-lg min-w-[24px] text-center flex-shrink-0 text-white group-hover:text-black"></i> 
                         <span class="font-bold expand-text uppercase tracking-widest font-orbitron text-sm">GENERAR PDF</span>
-                    </a>
+                    </button>
                 </div>
+
                 <a href="#inicio" class="flex items-center px-3 py-2 rounded clip-tron hover:bg-tron-primary/10 border-l-2 border-transparent hover:border-tron-primary text-gray-300 hover:text-white transition-all overflow-hidden whitespace-nowrap">
                     <i class="fas fa-power-off text-lg min-w-[24px] text-center flex-shrink-0"></i> 
                     <span class="font-bold expand-text font-orbitron">INICIO</span>
@@ -234,7 +311,7 @@
             </div>
         </aside>
 
-        <!-- CONTENIDO PRINCIPAL -->
+        <!-- CONTENIDO PRINCIPAL (Omitido para brevedad, no cambia) -->
         <main class="w-full md:ml-[4.5rem] p-6 md:p-12 relative z-10 transition-all duration-500">
             <!-- HERO SECTION -->
             <section id="inicio" class="min-h-screen flex flex-col justify-center mb-20 relative">
@@ -600,13 +677,13 @@
             <!-- Footer -->
             <footer class="text-center text-gray-600 text-xs font-mono mt-20 pt-10 border-t border-gray-900 mb-10">
                 <p class="mb-2 tracking-[0.5em] font-orbitron">END OF LINE</p>
-                <p class="font-rajdhani">&copy; {% now "Y" %} {{ perfil.nombres|default:"USUARIO" }} {{ perfil.apellidos|default:"DESCONOCIDO" }}. SISTEMA v7.0 SECURE.</p>
+                <p class="font-rajdhani">&copy; {% now "Y" %} {{ perfil.nombres|default:"USUARIO" }} {{ perfil.apellidos|default:"DESCONOCIDO" }}. SISTEMA v8.0 SECURE.</p>
             </footer>
 
         </main>
     </div>
 
-    <!-- Script del Previsualizador y Toggle de Tema -->
+    <!-- Scripts -->
     <script>
         function toggleTheme() {
             const body = document.getElementById('main-body');
@@ -626,9 +703,10 @@
         }
         
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("%c VERSIÓN V7 - ESTILO DE TARJETAS CORREGIDO ", "background: #00f3ff; color: #000000; font-size: 20px; font-weight: bold;");
+            console.log("%c VERSIÓN V8 - MODAL DE SELECCIÓN AGREGADO ", "background: #00f3ff; color: #000000; font-size: 20px; font-weight: bold;");
             if(localStorage.getItem('cv-theme') === 'ares') toggleTheme(); 
             
+            // Asignar evento al modal con comprobación de seguridad
             const modal = document.getElementById('preview-modal');
             if (modal) {
                 modal.addEventListener('click', function(e) { 
@@ -640,8 +718,47 @@
             if(closeBtn) {
                closeBtn.addEventListener('click', closePreview);
             }
+
+            // Asignar evento al modal de PDF
+            const pdfModal = document.getElementById('pdf-selection-modal');
+            if (pdfModal) {
+                pdfModal.addEventListener('click', function(e) { 
+                    if (e.target === this) closePdfModal(); 
+                });
+            }
         });
 
+        // --- LÓGICA DE PDF ---
+        function openPdfModal() {
+            const modal = document.getElementById('pdf-selection-modal');
+            if(modal) modal.classList.remove('hidden');
+        }
+
+        function closePdfModal() {
+            const modal = document.getElementById('pdf-selection-modal');
+            if(modal) modal.classList.add('hidden');
+        }
+
+        function generarPDF(event) {
+            event.preventDefault();
+            
+            // Obtener valores de los checkboxes
+            const exp = document.getElementById('chk-experiencia').checked;
+            const cursos = document.getElementById('chk-cursos').checked;
+            const logros = document.getElementById('chk-logros').checked;
+            const proy = document.getElementById('chk-proyectos').checked;
+            const garage = document.getElementById('chk-garage').checked;
+            
+            // Construir URL con parámetros
+            const baseUrl = "{% url 'exportar_cv' %}";
+            const finalUrl = `${baseUrl}?exp=${exp}&cursos=${cursos}&logros=${logros}&proy=${proy}&garage=${garage}`;
+            
+            // Abrir en nueva pestaña
+            window.open(finalUrl, '_blank');
+            closePdfModal();
+        }
+
+        // --- LÓGICA DE PREVISUALIZADOR (Mantenida de V7) ---
         function openPreview(url) {
             console.log("Intentando abrir previsualización para:", url);
             
@@ -654,7 +771,6 @@
             
             if (!modal) return;
 
-            // Resetear estado visual
             modal.classList.remove('hidden');
             if(loader) loader.classList.remove('hidden');
             if(frame) frame.classList.add('hidden');
@@ -663,7 +779,6 @@
             if(img) img.src = '';
             if(downloadLink) downloadLink.href = url;
 
-            // --- LÓGICA DE DETECCIÓN ---
             const isPDF = url.toLowerCase().includes('.pdf');
             const hasImageExtension = url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i);
             const looksLikeImage = hasImageExtension || (url.includes('image/upload') && !isPDF);
@@ -674,7 +789,6 @@
                     img.src = url;
                     
                     img.onload = () => { 
-                        console.log("Imagen cargada correctamente");
                         if(loader) loader.classList.add('hidden'); 
                         if(imgContainer) imgContainer.classList.remove('hidden'); 
                     };
@@ -704,13 +818,11 @@
                 frame.src = proxyUrl;
                 
                 setTimeout(() => {
-                    console.log("Forzando visualización del iframe (Timeout)");
                     if(loader) loader.classList.add('hidden');
                     frame.classList.remove('hidden');
                 }, 1500); 
                 
                 frame.onload = () => {
-                    console.log("Documento cargado en iframe (onload)");
                     if(loader) loader.classList.add('hidden');
                     frame.classList.remove('hidden');
                 };
