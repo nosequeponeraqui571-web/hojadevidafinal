@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM v8.3 | {{ perfil.nombres|default:"USUARIO" }}</title>
+    <title>SYSTEM v8.4 | {{ perfil.nombres|default:"USUARIO" }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -182,7 +182,7 @@
         </div>
     </div>
 
-    <!-- MODAL PREVISUALIZADOR (Mantenido) -->
+    <!-- MODAL PREVISUALIZADOR ADAPTATIVO -->
     <div id="preview-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 md:p-8">
         <div id="modal-content" class="relative bg-black border border-tron-primary shadow-neon flex flex-col clip-tron transition-all duration-500 ease-in-out overflow-hidden w-full max-w-5xl h-[85vh]">
             <!-- Header -->
@@ -664,7 +664,13 @@
                     {% for item in venta_garage %}
                     <div class="bg-black border border-white/20 relative overflow-hidden group hover:border-tron-primary hover:shadow-neon transition duration-500 clip-tron h-full flex flex-col">
                         <div class="h-48 bg-gray-900 flex items-center justify-center border-b border-gray-800 relative">
+                            <!-- IMAGEN AMPLIABLE -->
                             {% if item.foto_producto %}
+                                <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer" onclick="openPreview('{{ item.foto_producto.url }}')">
+                                    <span class="text-white font-orbitron tracking-widest border border-white px-4 py-2 hover:bg-white hover:text-black transition">
+                                        <i class="fas fa-expand me-2"></i> AMPLIAR
+                                    </span>
+                                </div>
                                 <img src="{{ item.foto_producto.url }}" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition duration-500">
                             {% else %}
                                 <i class="fas fa-cube text-6xl text-gray-700 group-hover:text-tron-primary transition duration-500"></i>
@@ -706,7 +712,7 @@
             <!-- Footer -->
             <footer class="text-center text-gray-600 text-xs font-mono mt-20 pt-10 border-t border-gray-900 mb-10">
                 <p class="mb-2 tracking-[0.5em] font-orbitron">END OF LINE</p>
-                <p class="font-rajdhani">&copy; {% now "Y" %} {{ perfil.nombres|default:"USUARIO" }} {{ perfil.apellidos|default:"DESCONOCIDO" }}. SISTEMA v8.3 SECURE.</p>
+                <p class="font-rajdhani">&copy; {% now "Y" %} {{ perfil.nombres|default:"USUARIO" }} {{ perfil.apellidos|default:"DESCONOCIDO" }}. SISTEMA v8.4 SECURE.</p>
             </footer>
 
         </main>
@@ -732,7 +738,7 @@
         }
         
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("%c VERSIÓN V8.3 - ESTADO VENTA GARAGE CORREGIDO ", "background: #00f3ff; color: #000000; font-size: 20px; font-weight: bold;");
+            console.log("%c VERSIÓN V8.4 - ZOOM VENTA GARAGE ", "background: #00f3ff; color: #000000; font-size: 20px; font-weight: bold;");
             if(localStorage.getItem('cv-theme') === 'ares') toggleTheme(); 
             
             const modal = document.getElementById('preview-modal');
