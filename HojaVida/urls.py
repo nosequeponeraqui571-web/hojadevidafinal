@@ -4,6 +4,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from Perfil import views 
 
+# --- PERSONALIZACIÓN DEL PANEL DE ADMINISTRACIÓN ---
+admin.site.site_header = "Panel de hoja de vida"      # Texto en la esquina superior izquierda (lo que pediste)
+admin.site.site_title = "Panel de hoja de vida"       # Texto en la pestaña del navegador
+admin.site.index_title = "Administración del Sistema" # Subtítulo en la página principal del admin
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
